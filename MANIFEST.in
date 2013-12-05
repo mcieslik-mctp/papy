@@ -1,0 +1,15 @@
+# top-level
+include *.rst
+
+# sources
+recursive-include src *
+
+# tests
+recursive-include test *
+
+# documentation
+recursive-include doc *
+prune doc/build
+
+# cleanup
+global-exclude *.elc *.orig *.rej *~ *.o *.so *.pyc *.swp *.prof *py.class
