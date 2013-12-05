@@ -15,4 +15,6 @@ function and iterable **tasks**. The **tasks** are **not** queued rather
 they are **interwoven** and share a pool or **worker** "processes" or
 "threads" and a memory "buffer".
 
+Documentation can be found [here](<http://mcieslik-mctp.github.io/papy/>)
+
 The package is tested on Python 2.7.5
