@@ -11,13 +11,13 @@ processing workflow that depends on Python libraries or external tools.
 workflows. 
 
     * project page: 
-        http://code.google.com/p/papy/
+        http://mcieslik-mctp.github.io/papy
     * repository lives at: 
-        http://papy.googlecode.com/svn/trunk/papy
-    * most recent documentation sources: 
-        http://papy.googlecode.com/svn/trunk/papy/doc/source/
+        https://github.com/mcieslik-mctp/papy.git
+    * most recent documentation sources:
+        http://mcieslik-mctp.github.io/papy
     * author email: 
-        mpc4p@virginia.edu
+        mcieslik-mctp@med.umich.edu
 
 This documentation covers the design, implementation and usage of **PaPy**. It 
 consists of a hand-written manual and an API-reference. Please refer also to the
