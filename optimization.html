@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Optimization &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Runtime (Logging, Interaction, Errors and Timeouts)" href="runtime.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="runtime.html" title="Runtime (Logging, Interaction, Errors and Timeouts)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="optimization">
+<h1>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h1>
+<p>The throughput of a pipeline will be most significantly limited by the slowest
+<tt class="docutils literal"><span class="pre">Piper</span></tt>. A processing node might be slow either because it does a
+CPU-intensive or IO-intensive task, because it waits for some data, or because
+it synchronizes with other nodes and waits.</p>
+<div class="section" id="identifying-bottlenecks">
+<h2>Identifying bottlenecks<a class="headerlink" href="#identifying-bottlenecks" title="Permalink to this headline">¶</a></h2>
+<p>As a general rule you should optimize the bottleneck(s) only. Therefore it is
+critical to understand where and what the bottleneck is.</p>
+<p>This has good reason as most of your nodes will not limit the throughput of the
+workflow while parallelization is quite expensive. If your pipeline has no
+obvious bottleneck it&#8217;s probably fast enough. If not you might be able to
+use a shared pool.</p>
+</div>
+<div class="section" id="understanding-bottlenecks">
+<h2>Understanding bottlenecks<a class="headerlink" href="#understanding-bottlenecks" title="Permalink to this headline">¶</a></h2>
+<p>To Be Written.</p>
+<div class="section" id="addressing-synchronization">
+<h3>Addressing synchronization<a class="headerlink" href="#addressing-synchronization" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="unordered-pipers">
+<h2>Unordered Pipers<a class="headerlink" href="#unordered-pipers" title="Permalink to this headline">¶</a></h2>
+<p>Unordered pipers return results in an arbitrary order e.g for the input sequence
+<tt class="docutils literal"><span class="pre">[3,2,1]</span></tt> a parallel unordered <tt class="docutils literal"><span class="pre">Piper</span></tt> instance with a function that doubles
+the input might return <tt class="docutils literal"><span class="pre">[6,2,4]</span></tt> or any other permutation of the doubled
+numbers. Unordered nodes do not compute faster they only make the results
+available sooner. Thus a down-stream computation that uses the same
+computational resource can start earlier and potentially utilize it to a fuller
+extent. You should consider unordered <tt class="docutils literal"><span class="pre">Pipers</span></tt> if the computation time for
+data items varies significantly.</p>
+<div class="section" id="addressing-serialization">
+<h3>Addressing serialization<a class="headerlink" href="#addressing-serialization" title="Permalink to this headline">¶</a></h3>
+<p>To Be Written.</p>
+</div>
+<div class="section" id="distributing-computational-resources">
+<h3>Distributing Computational resources<a class="headerlink" href="#distributing-computational-resources" title="Permalink to this headline">¶</a></h3>
+<p>As a general rule of you most likely should not use a shared <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance
+among all <tt class="docutils literal"><span class="pre">Pipers</span></tt> within a workflow.</p>
+<p>If the throughput of your pipeline is limited by a cpu-intensive tasks you
+should parallelize this node. <strong>PaPy</strong> allows to parallelize cpu-bound
+<tt class="docutils literal"><span class="pre">Pipers</span></tt>.  The amount of cpu-power should be proportional to the computational
+requirements of a processing task. The number of recommended <tt class="docutils literal"><span class="pre">NuMap</span></tt> pool
+worker processes should equal or  slightly larger than the number of physical
+CPU-cores on each local or remote computer.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Optimization</a><ul>
+<li><a class="reference internal" href="#identifying-bottlenecks">Identifying bottlenecks</a></li>
+<li><a class="reference internal" href="#understanding-bottlenecks">Understanding bottlenecks</a><ul>
+<li><a class="reference internal" href="#addressing-synchronization">Addressing synchronization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unordered-pipers">Unordered Pipers</a><ul>
+<li><a class="reference internal" href="#addressing-serialization">Addressing serialization</a></li>
+<li><a class="reference internal" href="#distributing-computational-resources">Distributing Computational resources</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="runtime.html"
+                        title="previous chapter">Runtime (Logging, Interaction, Errors and Timeouts)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">Examples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/optimization.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="runtime.html" title="Runtime (Logging, Interaction, Errors and Timeouts)"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

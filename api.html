@@ -1,0 +1,1833 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PaPy API &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Dictionary of terms and definitions" href="terms.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="terms.html" title="Dictionary of terms and definitions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="papy-api">
+<h1><strong>PaPy</strong> API<a class="headerlink" href="#papy-api" title="Permalink to this headline">¶</a></h1>
+<p>This part of the documentation is generated automatically from the source code
+documentation strings. It should be the most up-to-date version. If there is a
+conflict between the hand-written and and generated documentation, please
+contact the author e.g. by adding an issue on the project page.</p>
+<p><tt class="docutils literal"><span class="pre">NuMap</span></tt> is a parallel (local or remote), buffered, multi-task, lazy map
+function, which can use threads and processes.</p>
+<span class="target" id="module-papy.core"></span><div class="section" id="papy-core">
+<h2><a class="reference internal" href="#module-papy.core" title="papy.core"><tt class="xref py py-mod docutils literal"><span class="pre">papy.core</span></tt></a><a class="headerlink" href="#papy-core" title="Permalink to this headline">¶</a></h2>
+<p>This module provides classes and functions to construct and run a <strong>PaPy</strong> 
+pipeline.</p>
+<dl class="class">
+<dt id="papy.core.Dagger">
+<em class="property">class </em><tt class="descclassname">papy.core.</tt><tt class="descname">Dagger</tt><big>(</big><em>pipers=()</em>, <em>pipes=()</em>, <em>xtras=None</em><big>)</big><a class="headerlink" href="#papy.core.Dagger" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> is a directed acyclic graph. It defines the topology of a 
+<tt class="docutils literal"><span class="pre">PaPy</span></tt> pipeline / workflow. It is a subclass of <tt class="docutils literal"><span class="pre">DictGraph</span></tt>. 
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt> edges are called within the <tt class="docutils literal"><span class="pre">Dagger</span></tt> pipes and have an 
+inverted direction which reflects dataflow not dependency. Edges can be 
+thought of as dependencies, while pipes as dataflow between <tt class="docutils literal"><span class="pre">Pipers</span></tt> or 
+nodes of the graph.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipers(sequence) [default: <tt class="docutils literal"><span class="pre">()</span></tt>]  A sequence of valid <tt class="docutils literal"><span class="pre">add_piper</span></tt> 
+inputs (see the documentation for the <tt class="docutils literal"><span class="pre">add_piper</span></tt> method).</li>
+<li>pipes(sequence) [default: <tt class="docutils literal"><span class="pre">()</span></tt>] A sequence of valid <tt class="docutils literal"><span class="pre">add_pipe</span></tt> 
+inputs  (see the documentation for the <tt class="docutils literal"><span class="pre">add_piper</span></tt> method).</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="papy.core.Dagger.add_pipe">
+<tt class="descname">add_pipe</tt><big>(</big><em>pipe</em>, <em>branch=None</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.add_pipe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a pipe (A, ..., N) which is an N-<tt class="docutils literal"><span class="pre">tuple</span></tt> tuple of <tt class="docutils literal"><span class="pre">Pipers</span></tt> 
+instances. Adding a pipe means to add all the <tt class="docutils literal"><span class="pre">Pipers</span></tt> and connect 
+them in the specified left to right order.</p>
+<p>The direction of the edges in the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> is reversed compared to 
+the left to right data-flow in a pipe.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipe(sequence) N-<tt class="docutils literal"><span class="pre">tuple</span></tt> of <tt class="docutils literal"><span class="pre">Piper</span></tt> instances or objects which 
+are valid  <tt class="docutils literal"><span class="pre">add_piper</span></tt> arguments. See: <tt class="docutils literal"><span class="pre">Dagger.add_piper</span></tt> and 
+<tt class="docutils literal"><span class="pre">Dagger.resolve</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.add_piper">
+<tt class="descname">add_piper</tt><big>(</big><em>piper</em>, <em>xtra=None</em>, <em>create=True</em>, <em>branch=None</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.add_piper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance to this <tt class="docutils literal"><span class="pre">Dagger</span></tt>, but only if the <tt class="docutils literal"><span class="pre">Piper</span></tt> 
+is not already there. Optionally creates a new <tt class="docutils literal"><span class="pre">Piper</span></tt> if the &#8220;piper&#8221;
+argument is valid for the <tt class="docutils literal"><span class="pre">Piper</span></tt> constructor. Returns a <tt class="docutils literal"><span class="pre">tuple</span></tt>
+(new_piper_created, piper_instance) indicating whether a new <tt class="docutils literal"><span class="pre">Piper</span></tt> 
+has been created and the instance of the added <tt class="docutils literal"><span class="pre">Piper</span></tt>. Optionally 
+takes &#8220;branch&#8221; and &#8220;xtra&#8221; arguments for the topological node in the 
+graph.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>piper(<tt class="docutils literal"><span class="pre">Piper</span></tt>, <tt class="docutils literal"><span class="pre">Worker</span></tt> or id(<tt class="docutils literal"><span class="pre">Piper</span></tt>)) <tt class="docutils literal"><span class="pre">Piper</span></tt> instance or 
+object which will be converted to a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance.</li>
+<li>create(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">True</span></tt>] Should a new <tt class="docutils literal"><span class="pre">Piper</span></tt> be 
+created if &#8220;piper&#8221; cannot be resolved in this <tt class="docutils literal"><span class="pre">Dagger</span></tt>?</li>
+<li>xtra(<tt class="docutils literal"><span class="pre">dict</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] Dictionary of  <tt class="docutils literal"><span class="pre">graph.Node</span></tt>  
+properties.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.add_pipers">
+<tt class="descname">add_pipers</tt><big>(</big><em>pipers</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.add_pipers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a sequence of <tt class="docutils literal"><span class="pre">Pipers</span></tt> instances to the <tt class="docutils literal"><span class="pre">Dagger</span></tt> in the 
+specified order. Takes optional arguments for <tt class="docutils literal"><span class="pre">Dagger.add_piper</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipers(sequence of valid <tt class="docutils literal"><span class="pre">add_piper</span></tt> arguments) Sequence of 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> or valid <tt class="docutils literal"><span class="pre">Dagger.add_piper</span></tt> arguments to be added to 
+the <tt class="docutils literal"><span class="pre">Dagger</span></tt> in the left to right order.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.add_pipes">
+<tt class="descname">add_pipes</tt><big>(</big><em>pipes</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.add_pipes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a sequence of pipes to the <tt class="docutils literal"><span class="pre">Dagger</span></tt> in the specified order. 
+Takes optional arguments for <tt class="docutils literal"><span class="pre">Dagger.add_pipe</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipes(sequence of valid <tt class="docutils literal"><span class="pre">add_pipe</span></tt> arguments) Sequence of pipes 
+or other valid <tt class="docutils literal"><span class="pre">Dagger.add_pipe</span></tt> arguments to be added to the 
+<tt class="docutils literal"><span class="pre">Dagger</span></tt> in the left to right order.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.children_after_parents">
+<tt class="descname">children_after_parents</tt><big>(</big><em>piper1</em>, <em>piper2</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.children_after_parents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom compare function. Returns <tt class="docutils literal"><span class="pre">1</span></tt> if the first <tt class="docutils literal"><span class="pre">Piper</span></tt> instance 
+is upstream of the second <tt class="docutils literal"><span class="pre">Piper</span></tt> instance, <tt class="docutils literal"><span class="pre">-1</span></tt> if the first 
+<tt class="docutils literal"><span class="pre">Piper</span></tt> is downstream of the second <tt class="docutils literal"><span class="pre">Piper</span></tt> and <tt class="docutils literal"><span class="pre">0</span></tt> if the two 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> are independent.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>piper1(<tt class="docutils literal"><span class="pre">Piper</span></tt>) <tt class="docutils literal"><span class="pre">Piper</span></tt> instance.</li>
+<li>piper2(<tt class="docutils literal"><span class="pre">Piper</span></tt>) <tt class="docutils literal"><span class="pre">Piper</span></tt> instance.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.connect">
+<tt class="descname">connect</tt><big>(</big><em>datas=None</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects <tt class="docutils literal"><span class="pre">Pipers</span></tt> in the order input -&gt; output. See <tt class="docutils literal"><span class="pre">Piper.connect</span></tt>.
+According to the pipes (topology). If &#8220;datas&#8221; is given will connect the
+input <tt class="docutils literal"><span class="pre">Pipers</span></tt> to the input data see: <tt class="docutils literal"><span class="pre">Dagger.connect_inputs</span></tt>.</p>
+<p>Argumensts:</p>
+<blockquote>
+<div><ul class="simple">
+<li>datas(sequence) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] valid sequence of input data.
+see: <tt class="docutils literal"><span class="pre">Dagger.connect_inputs</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.connect_inputs">
+<tt class="descname">connect_inputs</tt><big>(</big><em>datas</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.connect_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects input <tt class="docutils literal"><span class="pre">Pipers</span></tt> to &#8220;datas&#8221; input data  in the correct order 
+determined, by the <tt class="docutils literal"><span class="pre">Piper.ornament</span></tt> attribute and the <tt class="docutils literal"><span class="pre">Dagger._cmp</span></tt> 
+function.</p>
+<p>It is assumed that the input data is in the form of an iterator and
+that all inputs have the same number of input items. A pipeline will
+<strong>deadlock</strong> otherwise.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>datas (sequence of sequences) An ordered sequence of inputs for 
+all input <tt class="docutils literal"><span class="pre">Pipers</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.del_pipe">
+<tt class="descname">del_pipe</tt><big>(</big><em>pipe</em>, <em>forced=False</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.del_pipe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a pipe (A, ..., N) which is an N-<tt class="docutils literal"><span class="pre">tuple</span></tt> of <tt class="docutils literal"><span class="pre">Piper</span></tt> 
+instances. Deleting a pipe means to delete all the connections between 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> and to delete all the <tt class="docutils literal"><span class="pre">Pipers</span></tt>. If &#8220;forced&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt> 
+only <tt class="docutils literal"><span class="pre">Pipers</span></tt> which are not used anymore (i.e. have not downstream 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt>) are deleted.</p>
+<p>The direction of the edges in the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> is reversed compared to 
+the left to right data-flow in a pipe.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipe(sequence) N-<tt class="docutils literal"><span class="pre">tuple</span></tt> of <tt class="docutils literal"><span class="pre">Piper</span></tt> instances or objects which 
+can be resolved in the <tt class="docutils literal"><span class="pre">Dagger</span></tt> (see: <tt class="docutils literal"><span class="pre">Dagger.resolve</span></tt>). The 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> are removed in the order from right to left.</li>
+<li>forced(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] The forced argument will be 
+given to the <tt class="docutils literal"><span class="pre">Dagger.del_piper</span></tt> method. If &#8220;forced&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt> 
+only <tt class="docutils literal"><span class="pre">Pipers</span></tt> with no outgoing pipes will be deleted.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.del_piper">
+<tt class="descname">del_piper</tt><big>(</big><em>piper</em>, <em>forced=False</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.del_piper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a <tt class="docutils literal"><span class="pre">Piper</span></tt> from the <tt class="docutils literal"><span class="pre">Dagger</span></tt> instance.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>piper(<tt class="docutils literal"><span class="pre">Piper</span></tt>  or id(<tt class="docutils literal"><span class="pre">Piper</span></tt>)) <tt class="docutils literal"><span class="pre">Piper</span></tt> instance or <tt class="docutils literal"><span class="pre">Piper</span></tt> 
+instance id.</li>
+<li>forced(bool) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If &#8220;forced&#8221; is <tt class="docutils literal"><span class="pre">True</span></tt>, will not 
+raise a <tt class="docutils literal"><span class="pre">DaggerError</span></tt> if the <tt class="docutils literal"><span class="pre">Piper</span></tt> hase outgoing pipes and 
+will also remove it.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.del_pipers">
+<tt class="descname">del_pipers</tt><big>(</big><em>pipers</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.del_pipers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a sequence of <tt class="docutils literal"><span class="pre">Pipers</span></tt> instances from the <tt class="docutils literal"><span class="pre">Dagger</span></tt> in the
+reverse of the specified order. Takes optional arguments for 
+<tt class="docutils literal"><span class="pre">Dagger.del_piper</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipers (sequence of valid <tt class="docutils literal"><span class="pre">del_piper</span></tt> arguments) Sequence of 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> or valid <tt class="docutils literal"><span class="pre">Dagger.del_piper</span></tt> arguments to be removed 
+from the <tt class="docutils literal"><span class="pre">Dagger</span></tt> in the right to left order.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.del_pipes">
+<tt class="descname">del_pipes</tt><big>(</big><em>pipes</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.del_pipes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a sequence of pipes from the <tt class="docutils literal"><span class="pre">Dagger</span></tt> in the specified order. 
+Takes optional arguments for <tt class="docutils literal"><span class="pre">Dagger.del_pipe</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pipes(sequence of valid <tt class="docutils literal"><span class="pre">del_pipe</span></tt> arguments) Sequence of pipes or 
+other valid <tt class="docutils literal"><span class="pre">Dagger.del_pipe</span></tt> arguments to be removed from the 
+<tt class="docutils literal"><span class="pre">Dagger</span></tt> in the left to right order.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><em>forced=False</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the pipeline topology disconnects <tt class="docutils literal"><span class="pre">Pipers</span></tt> in the order output 
+-&gt; input. This also disconnects inputs. See <tt class="docutils literal"><span class="pre">Dagger.connect</span></tt>,
+<tt class="docutils literal"><span class="pre">Piper.connect</span></tt> and <tt class="docutils literal"><span class="pre">Piper.disconnect</span></tt>. If &#8220;forced&#8221; is <tt class="docutils literal"><span class="pre">True</span></tt>
+<tt class="docutils literal"><span class="pre">NuMap</span></tt> instances will be emptied.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>forced(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If set <tt class="docutils literal"><span class="pre">True</span></tt> all tasks from
+all <tt class="docutils literal"><span class="pre">NuMaps</span></tt> instances used in the <tt class="docutils literal"><span class="pre">Dagger</span></tt> will be removed even
+if they did not belong to this <tt class="docutils literal"><span class="pre">Dagger</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.get_inputs">
+<tt class="descname">get_inputs</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Dagger.get_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <tt class="docutils literal"><span class="pre">Piper</span></tt> instances, which are inputs to the pipeline i.e. have 
+no incoming pipes (outgoing dependency edges).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.get_outputs">
+<tt class="descname">get_outputs</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Dagger.get_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <tt class="docutils literal"><span class="pre">Piper</span></tt> instances, which are outputs to the pipeline i.e. have
+no outgoing pipes (incoming dependency edges).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.resolve">
+<tt class="descname">resolve</tt><big>(</big><em>piper</em>, <em>forgive=False</em><big>)</big><a class="headerlink" href="#papy.core.Dagger.resolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance or the <tt class="docutils literal"><span class="pre">id</span></tt> of the <tt class="docutils literal"><span class="pre">Piper</span></tt>. Returns the
+<tt class="docutils literal"><span class="pre">Piper</span></tt> instance if it can be resolved else raises a <tt class="docutils literal"><span class="pre">DaggerError</span></tt> 
+or returns <tt class="docutils literal"><span class="pre">False</span></tt> depending on the &#8220;forgive&#8221; argument.</p>
+<p>Arguments:</p>
+<ul class="simple">
+<li>piper(<tt class="docutils literal"><span class="pre">Piper</span></tt> or id(<tt class="docutils literal"><span class="pre">Piper</span></tt>)) a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance or its id to be
+found in the <tt class="docutils literal"><span class="pre">Dagger</span></tt>.</li>
+<li>forgive(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If &#8220;forgive&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt> a 
+<tt class="docutils literal"><span class="pre">DaggerError</span></tt> is raised whenever a  <tt class="docutils literal"><span class="pre">Piper</span></tt> cannot be resolved in 
+the <tt class="docutils literal"><span class="pre">Dagger</span></tt>. If &#8220;forgive&#8221; is <tt class="docutils literal"><span class="pre">True</span></tt> then <tt class="docutils literal"><span class="pre">False</span></tt> is returned.</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Dagger.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the pipeline topology starts <tt class="docutils literal"><span class="pre">Pipers</span></tt> in the order input -&gt; 
+output. See <tt class="docutils literal"><span class="pre">Piper.start</span></tt>. <tt class="docutils literal"><span class="pre">Pipers</span></tt> instances are started in two 
+stages, which allows them to share <tt class="docutils literal"><span class="pre">NuMaps</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Dagger.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Dagger.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the <tt class="docutils literal"><span class="pre">Pipers</span></tt> according to pipeline topology.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="papy.core.DaggerError">
+<em class="property">exception </em><tt class="descclassname">papy.core.</tt><tt class="descname">DaggerError</tt><a class="headerlink" href="#papy.core.DaggerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions raised or related to <tt class="docutils literal"><span class="pre">Dagger</span></tt> instances.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="papy.core.Piper">
+<em class="property">class </em><tt class="descclassname">papy.core.</tt><tt class="descname">Piper</tt><big>(</big><em>worker</em>, <em>parallel=False</em>, <em>consume=1</em>, <em>produce=1</em>, <em>spawn=1</em>, <em>timeout=None</em>, <em>branch=None</em>, <em>debug=False</em>, <em>name=None</em>, <em>track=False</em>, <em>repeat=False</em><big>)</big><a class="headerlink" href="#papy.core.Piper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <tt class="docutils literal"><span class="pre">Piper</span></tt> instance. The <tt class="docutils literal"><span class="pre">Piper</span></tt> is an <tt class="docutils literal"><span class="pre">object</span></tt> that acts
+a a processing node in a PaPy pipeline.</p>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt> can be created from a <tt class="docutils literal"><span class="pre">Worker</span></tt> instance another <tt class="docutils literal"><span class="pre">Piper</span></tt> 
+instance or a sequence of functions or <tt class="docutils literal"><span class="pre">Worker</span></tt> instances in every case a 
+new <tt class="docutils literal"><span class="pre">Piper</span></tt> instance is created.</p>
+<p><tt class="docutils literal"><span class="pre">Piper</span></tt> instances evaluate functions in parallel if they are created 
+with a <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance provided otherwise they use the <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> 
+function.</p>
+<p>The &#8220;produce&#8221; and &#8220;consume&#8221; arguments allow for different than 1:1 mappings
+between the number of input and output items, while &#8220;spawn&#8221; allows 
+accomodate a <tt class="docutils literal"><span class="pre">Piper</span></tt> to handle additional outputs. Additional outputs are
+created from the elements of the sequence returned by the wrapped <tt class="docutils literal"><span class="pre">Worker</span></tt>
+instance.</p>
+<p>The product of &#8220;produce&#8221; and &#8220;spawn&#8221; of the upstream <tt class="docutils literal"><span class="pre">Piper</span></tt> has to equal 
+the product of &#8220;consume&#8221; and &#8220;spawn&#8221; of the downstream <tt class="docutils literal"><span class="pre">Piper</span></tt>, for 
+<strong>each</strong> pair of pipers connected.</p>
+<p>The &#8220;branch&#8221; argument sets the &#8220;branch&#8221; attribute of a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance. 
+If two <tt class="docutils literal"><span class="pre">Pipers</span></tt> have no upstream-&gt;downstream relation they will be sorted 
+according to their &#8220;branch&#8221; attributes. If neither of them has a &#8220;branch&#8221;
+attribute or both are identical their sort order will be semi-random. 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> will implicitly inherit the &#8220;branch&#8221; of an up-stream <tt class="docutils literal"><span class="pre">Piper</span></tt>, 
+thus it is only necessary to sepcify the branch of a <tt class="docutils literal"><span class="pre">Piper</span></tt> if it is the
+first one after a branch point.</p>
+<p>It is possible to construct pipelines without specifying branches if 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> which are connected to multiple up-stream <tt class="docutils literal"><span class="pre">Pipers</span></tt> 
+(the order of which is by default semi-random) use <tt class="docutils literal"><span class="pre">Workers</span></tt> that act 
+correctly regardless of the order of results in their inbox.</p>
+<p>If &#8220;debug&#8221; is <tt class="docutils literal"><span class="pre">True</span></tt> exceptions are raised on all errors. This will most 
+likely hang the Python interpreter after the error occurs. Use during 
+development only!</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>worker(<tt class="docutils literal"><span class="pre">Worker</span></tt>, <tt class="docutils literal"><span class="pre">Piper</span></tt> or sequence of functions or``Workers``)</li>
+<li>parallel(<tt class="docutils literal"><span class="pre">False</span></tt> or <tt class="docutils literal"><span class="pre">NuMap</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If parallel is 
+<tt class="docutils literal"><span class="pre">False</span></tt> the <tt class="docutils literal"><span class="pre">Piper</span></tt> instance will not process data-items in parallel</li>
+<li>consume(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">1</span></tt>] The number of input items consumed 
+from <strong>all</strong> directly connected upstream <tt class="docutils literal"><span class="pre">Pipers</span></tt> per one evaluation.</li>
+<li>produce(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: 1] The number of results to generate for each  
+evaluation result.</li>
+<li>spawn(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: 1] The number of times this <cite>Piper`</cite> is 
+implicitly  added to the pipeline to consume the specified number of 
+results.</li>
+<li>timeout(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] Time to wait till a result is 
+available. Otherwise a <tt class="docutils literal"><span class="pre">PiperError</span></tt> is <strong>returned</strong> not raised.</li>
+<li>branch(<tt class="docutils literal"><span class="pre">object</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] This affects the order of 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> in the <tt class="docutils literal"><span class="pre">Dagger</span></tt>. <tt class="docutils literal"><span class="pre">Piper</span></tt> instances are sorted according 
+to the data-flow upstream-&gt;downstream and their &#8220;branch&#8221; attributes.
+The argument can be any object which can be used by the <tt class="docutils literal"><span class="pre">cmp</span></tt> 
+built-in function. If necessary they can override the <tt class="docutils literal"><span class="pre">__cmp__</span></tt>  
+method.</li>
+<li>debug(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] Verbose debugging mode. Raises a 
+<tt class="docutils literal"><span class="pre">PiperError</span></tt> on <tt class="docutils literal"><span class="pre">WorkerErrors</span></tt>.</li>
+<li>name(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A string to identify the <tt class="docutils literal"><span class="pre">Piper</span></tt>.</li>
+<li>track(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> results of this 
+<tt class="docutils literal"><span class="pre">Piper</span></tt> will be tracked by the <tt class="docutils literal"><span class="pre">NuMap</span></tt> (ignored if <tt class="docutils literal"><span class="pre">Piper</span></tt> is 
+linear).</li>
+<li>repeat(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If <tt class="docutils literal"><span class="pre">True``and</span> <span class="pre">&quot;produce&quot;</span> <span class="pre">is</span> 
+<span class="pre">larger</span> <span class="pre">than</span> <span class="pre">``1</span></tt> the evaluated results will be repeated. If <tt class="docutils literal"><span class="pre">False</span></tt>
+it assumes that the evaluated results are sequences and produce will
+iterate over that <tt class="docutils literal"><span class="pre">list</span></tt> or <tt class="docutils literal"><span class="pre">tuple</span></tt>.</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="papy.core.Piper.connect">
+<tt class="descname">connect</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.core.Piper.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the <tt class="docutils literal"><span class="pre">Piper</span></tt> instance to its upstream <tt class="docutils literal"><span class="pre">Pipers</span></tt> that should
+be given as a sequence. This connects this <tt class="docutils literal"><span class="pre">Piper.inbox</span></tt> with the
+upstream <tt class="docutils literal"><span class="pre">Piper.outbox</span></tt> respecting any &#8220;consume&#8221;, &#8220;spawn&#8221; and 
+&#8220;produce&#8221; arguments.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>inbox(sequence) sequence of <tt class="docutils literal"><span class="pre">Piper</span></tt> instances.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Piper.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><em>forced=False</em><big>)</big><a class="headerlink" href="#papy.core.Piper.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnects the <tt class="docutils literal"><span class="pre">Piper</span></tt> instance from its upstream <tt class="docutils literal"><span class="pre">Pipers</span></tt> or 
+input data if the <tt class="docutils literal"><span class="pre">Piper</span></tt> is the input node of a pipeline.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>forced(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> the <tt class="docutils literal"><span class="pre">Piper</span></tt> will
+try to forcefully remove all tasks (including the spawned ones) from
+the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Piper.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Piper.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next result. If no result is availble within the specified 
+(during construction) &#8220;timeout&#8221; then a <tt class="docutils literal"><span class="pre">PiperError</span></tt> which wraps a  
+<tt class="docutils literal"><span class="pre">TimeoutError</span></tt> is <strong>returned</strong>.</p>
+<p>If the result is a <tt class="docutils literal"><span class="pre">WorkerError</span></tt> it is also wrapped in a 
+<tt class="docutils literal"><span class="pre">PiperError</span></tt> and is returned or raised if &#8220;debug&#8221; mode was specified 
+at initialization. If the result is a <tt class="docutils literal"><span class="pre">PiperError</span></tt> it is propagated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Piper.start">
+<tt class="descname">start</tt><big>(</big><em>stages=None</em><big>)</big><a class="headerlink" href="#papy.core.Piper.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the <tt class="docutils literal"><span class="pre">Piper</span></tt> ready to return results. This involves starting the 
+the provided <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance. If multiple <tt class="docutils literal"><span class="pre">Pipers</span></tt> share a 
+<tt class="docutils literal"><span class="pre">NuMap</span></tt> instance the order in which these <tt class="docutils literal"><span class="pre">Pipers</span></tt> are started is 
+important. The valid order is upstream before downstream. The <tt class="docutils literal"><span class="pre">NuMap</span></tt> 
+instance can only be started once, but the process can be done in 2 
+stages. This methods &#8220;stages&#8221; argument is a <tt class="docutils literal"><span class="pre">tuple</span></tt> which can contain
+any the numbers <tt class="docutils literal"><span class="pre">0</span></tt> and/or <tt class="docutils literal"><span class="pre">1</span></tt> and/or  <tt class="docutils literal"><span class="pre">2</span></tt> specifying which stage
+of the start routine should be carried out:</p>
+<blockquote>
+<div><ul class="simple">
+<li>stage 0 - creates the needed <tt class="docutils literal"><span class="pre">itertools.tee</span></tt> objects.</li>
+<li>stage 1 - activates <tt class="docutils literal"><span class="pre">NuMap</span></tt> pool. A call to <tt class="docutils literal"><span class="pre">next</span></tt> will block..</li>
+<li>stage 2 - activates <tt class="docutils literal"><span class="pre">NuMap</span></tt> pool managers.</li>
+</ul>
+</div></blockquote>
+<p>If this <tt class="docutils literal"><span class="pre">Piper</span></tt> shares a <tt class="docutils literal"><span class="pre">NuMap</span></tt> with other <tt class="docutils literal"><span class="pre">Pipers</span></tt> the proper 
+way to start them is to start them in a valid postorder with stages 
+<tt class="docutils literal"><span class="pre">(0,</span> <span class="pre">1)</span></tt> and <tt class="docutils literal"><span class="pre">(2,)</span></tt> separately.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>stages(tuple) [default: <tt class="docutils literal"><span class="pre">(0,)</span></tt> if linear; <tt class="docutils literal"><span class="pre">(0,1,2)</span></tt> if parallel]
+Performs the specified stages of the start of a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance. 
+Stage <tt class="docutils literal"><span class="pre">0</span></tt> is necessary and sufficient to start a linear <tt class="docutils literal"><span class="pre">Piper</span></tt> 
+which uses an <tt class="docutils literal"><span class="pre">itertools.imap</span></tt>. Stages <tt class="docutils literal"><span class="pre">1</span></tt> and <tt class="docutils literal"><span class="pre">2</span></tt> are 
+required to start any parallel <tt class="docutils literal"><span class="pre">Piper</span></tt> instance.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Piper.stop">
+<tt class="descname">stop</tt><big>(</big><em>forced=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.core.Piper.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to cleanly stop the <tt class="docutils literal"><span class="pre">Piper</span></tt> instance. A <tt class="docutils literal"><span class="pre">Piper</span></tt> is 
+&#8220;started&#8221; if its  <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance is &#8220;started&#8221;. Non-parallel 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> do not have to be started or stopped. An <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance
+can be stopped by triggering its stopping procedure and retrieving 
+results from the <tt class="docutils literal"><span class="pre">NuMaps</span></tt> end tasks. Because neither the <tt class="docutils literal"><span class="pre">Piper</span></tt> nor
+the <tt class="docutils literal"><span class="pre">NuMap</span></tt> &#8220;knows&#8221; which tasks i.e. <tt class="docutils literal"><span class="pre">Pipers</span></tt> are the end tasks 
+they have to be specified:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">end_task_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>    <span class="c"># A list of NuMap task ids</span>
+<span class="n">piper_instance</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">ends</span> <span class="o">=</span><span class="n">end_task_ids</span><span class="p">)</span>        
+</pre></div>
+</div>
+<p>results in:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">NuMap_instance</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">ends</span> <span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>If the <tt class="docutils literal"><span class="pre">Piper</span></tt> did not finish processing the data before the 
+stop method is called the &#8220;forced&#8221; argument has to be <tt class="docutils literal"><span class="pre">True</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">piper_instance</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">forced</span> <span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ends</span> <span class="o">=</span><span class="n">end_task_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the <tt class="docutils literal"><span class="pre">Piper</span></tt> (and consequently <tt class="docutils literal"><span class="pre">NuMap</span></tt>) is part of a <tt class="docutils literal"><span class="pre">Dagger</span></tt> 
+graph the <tt class="docutils literal"><span class="pre">Dagger.stop</span></tt> method should be called instead. See: 
+<tt class="docutils literal"><span class="pre">NuMap.stop</span></tt> and <tt class="docutils literal"><span class="pre">Dagger.stop</span></tt>.</p>
+<p># verify this:
+# If &#8220;forced&#8221; is set <tt class="docutils literal"><span class="pre">True</span></tt> but the ends <tt class="docutils literal"><span class="pre">NuMap</span></tt> argument is not
+# given. The <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance will not try to retrieve any results and
+# will not call the <tt class="docutils literal"><span class="pre">NuMap._stop</span></tt> method.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>forced(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] The <tt class="docutils literal"><span class="pre">Piper</span></tt> will be forced 
+to stop the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance.</li>
+</ul>
+</div></blockquote>
+<p>Additional keyworded arguments are passed to the <tt class="docutils literal"><span class="pre">Piper.imap</span></tt> 
+instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="papy.core.PiperError">
+<em class="property">exception </em><tt class="descclassname">papy.core.</tt><tt class="descname">PiperError</tt><a class="headerlink" href="#papy.core.PiperError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions raised or related to <tt class="docutils literal"><span class="pre">Piper</span></tt> instances.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="papy.core.Plumber">
+<em class="property">class </em><tt class="descclassname">papy.core.</tt><tt class="descname">Plumber</tt><big>(</big><em>logger_options={}</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.core.Plumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">Plumber</span></tt> is a subclass of <tt class="docutils literal"><span class="pre">Dagger</span></tt> and <tt class="docutils literal"><span class="pre">Graph</span></tt> with added 
+run-time methods and a high-level interface for working with <tt class="docutils literal"><span class="pre">PaPy</span></tt> 
+pipelines.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>dagger(<tt class="docutils literal"><span class="pre">Dagger</span></tt> instance) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] An optional <tt class="docutils literal"><span class="pre">Dagger</span></tt> 
+instance. if <tt class="docutils literal"><span class="pre">None</span></tt> a new one is created.</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="papy.core.Plumber.load">
+<tt class="descname">load</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#papy.core.Plumber.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instanciates (loads) pipeline from a source code file.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>filename(<tt class="docutils literal"><span class="pre">path</span></tt>) location of the pipeline source code.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Plumber.pause">
+<tt class="descname">pause</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Plumber.pause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pauses a running pipeline. This will stop retrieving results from the 
+pipeline. Parallel parts of the pipeline will stop after the <tt class="docutils literal"><span class="pre">NuMap</span></tt> 
+buffer is has been filled. A paused pipeline can be run or stopped.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Plumber.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Plumber.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a started pipeline by pulling results from it&#8217;s output 
+<tt class="docutils literal"><span class="pre">Pipers</span></tt>. Processing nodes i.e. <tt class="docutils literal"><span class="pre">Pipers</span></tt> with the <tt class="docutils literal"><span class="pre">track</span></tt> 
+attribute set <tt class="docutils literal"><span class="pre">True</span></tt> will have their returned results stored within 
+the <tt class="docutils literal"><span class="pre">Dagger.stats['pipers_tracked']</span></tt> dictionary. A running pipeline 
+can be paused.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Plumber.save">
+<tt class="descname">save</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#papy.core.Plumber.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves pipeline as a Python source code file.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>filename(<tt class="docutils literal"><span class="pre">path</span></tt>) Path to save the pipeline source code.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Plumber.start">
+<tt class="descname">start</tt><big>(</big><em>datas</em><big>)</big><a class="headerlink" href="#papy.core.Plumber.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the pipeline by connecting the input <tt class="docutils literal"><span class="pre">Pipers</span></tt> of the pipeline 
+to the input data, connecting the pipeline and starting the <tt class="docutils literal"><span class="pre">NuMap</span></tt>
+instances.</p>
+<p>The order of items in the &#8220;datas&#8221; argument sequence should correspond 
+to the order of the input <tt class="docutils literal"><span class="pre">Pipers</span></tt> defined by <tt class="docutils literal"><span class="pre">Dagger._cmp</span></tt> and 
+<tt class="docutils literal"><span class="pre">Piper.ornament</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>datas(sequence) A sequence of external input data in the form of 
+sequences or iterators.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Plumber.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.core.Plumber.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops a paused pipeline. This will a trigger a <tt class="docutils literal"><span class="pre">StopIteration</span></tt> in the
+inputs of the pipeline. And retrieve the buffered results. This will
+stop all <tt class="docutils literal"><span class="pre">Pipers</span></tt> and <tt class="docutils literal"><span class="pre">NuMaps</span></tt>. Python will not terminate cleanly 
+if a pipeline is running or paused.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.core.Plumber.wait">
+<tt class="descname">wait</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#papy.core.Plumber.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waits (blocks) until a running pipeline finishes.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>timeout(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] Specifies the timeout, 
+<tt class="docutils literal"><span class="pre">RuntimeError</span></tt> will be raised. The default is to wait indefinetely
+for the pipeline to finish.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="papy.core.PlumberError">
+<em class="property">exception </em><tt class="descclassname">papy.core.</tt><tt class="descname">PlumberError</tt><a class="headerlink" href="#papy.core.PlumberError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions raised or related to <tt class="docutils literal"><span class="pre">Plumber</span></tt> instances.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="papy.core.Worker">
+<em class="property">class </em><tt class="descclassname">papy.core.</tt><tt class="descname">Worker</tt><big>(</big><em>functions</em>, <em>arguments=None</em>, <em>kwargs=None</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#papy.core.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">Worker</span></tt> is an <tt class="docutils literal"><span class="pre">object</span></tt> that composes sequences of functions. When 
+called these functions are evaluated from left to right. The function on the
+right will receive the return value from the function on the left.</p>
+<p>The constructor takes optionally sequences of positional and keyworded 
+arguments for none or all of the composed functions. Positional arguments 
+should be given in a <tt class="docutils literal"><span class="pre">tuple</span></tt>. Each element of this <tt class="docutils literal"><span class="pre">tuple</span></tt> should be a 
+<tt class="docutils literal"><span class="pre">tuple</span></tt> of positional arguments for the corresponding function. If a 
+function does not take positional arguments its corresponding element in the
+arguments <tt class="docutils literal"><span class="pre">tuple</span></tt> should be an empty <tt class="docutils literal"><span class="pre">tuple</span></tt> i.e. <tt class="docutils literal"><span class="pre">()</span></tt>. Keyworded 
+arguments should also be given in a <tt class="docutils literal"><span class="pre">tuple</span></tt>. Each element of this 
+<tt class="docutils literal"><span class="pre">tuple</span></tt> should be a dictionary of arguments for the corresponding 
+function. If a function does not take any keyworded arguments
+its corresponding element in the keyworded arguments <tt class="docutils literal"><span class="pre">tuple</span></tt> should be an 
+empty <tt class="docutils literal"><span class="pre">dict</span></tt> i.e. <tt class="docutils literal"><span class="pre">{}</span></tt>. If none of the functions takes arguments of a 
+given type the positional and/or keyworded arguments <tt class="docutils literal"><span class="pre">tuple</span></tt> can be 
+omitted.</p>
+<p>All exceptions raised by the functions are caught, wrapped and returned 
+<strong>not</strong> raised. If the <tt class="docutils literal"><span class="pre">Worker</span></tt> is called with the first argument being a
+sequence which contains an <tt class="docutils literal"><span class="pre">Exception</span></tt> no function is evaluated and the 
+<tt class="docutils literal"><span class="pre">Exception</span></tt> is re-wrapped and returned.</p>
+<p>A <tt class="docutils literal"><span class="pre">Worker</span></tt> instance can be constructed in a variety of ways:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">with a sequence of functions and a optional sequences of positional and
+keyworded arguments e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Worker</span><span class="p">((</span><span class="n">func1</span><span class="p">,</span>         <span class="n">func2</span><span class="p">,</span>    <span class="n">func3</span><span class="p">),</span> 
+      <span class="p">((</span><span class="n">arg11</span><span class="p">,</span> <span class="n">arg21</span><span class="p">),</span> <span class="p">(</span><span class="n">arg21</span><span class="p">,),</span> <span class="p">()),</span>
+      <span class="p">({},</span>             <span class="p">{},</span>       <span class="p">{</span><span class="s">&#39;arg31&#39;</span><span class="p">:</span><span class="n">arg31</span><span class="p">}))</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">with another <tt class="docutils literal"><span class="pre">Worker</span></tt> instance, which results in their functional 
+equivalence e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Worker</span><span class="p">(</span><span class="n">worker_instance</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">with multiple <tt class="docutils literal"><span class="pre">Worker</span></tt> instances, where the functions and arguments of
+the <tt class="docutils literal"><span class="pre">Workers</span></tt> are combined e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Worker</span><span class="p">((</span><span class="n">worker1</span><span class="p">,</span> <span class="n">worker2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>this is equivalent to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Worker</span><span class="p">(</span><span class="n">worker1</span><span class="o">.</span><span class="n">task</span> <span class="o">+</span> <span class="n">worker2</span><span class="o">.</span><span class="n">task</span><span class="p">,</span>                  <span class="n">worker1</span><span class="o">.</span><span class="n">args</span> <span class="o">+</span> <span class="n">worker2</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>                  <span class="n">worker1</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">+</span> <span class="n">worker2</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">with a single function and its arguments in a tuple e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Worker</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>this is equivalent to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Worker</span><span class="p">((</span><span class="n">function</span><span class="p">,),((</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">),))</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="exception">
+<dt id="papy.core.WorkerError">
+<em class="property">exception </em><tt class="descclassname">papy.core.</tt><tt class="descname">WorkerError</tt><a class="headerlink" href="#papy.core.WorkerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions raised or related to <tt class="docutils literal"><span class="pre">Worker</span></tt> instances.</p>
+</dd></dl>
+
+</div>
+<span class="target" id="module-papy.graph"></span><div class="section" id="papy-graph">
+<h2><a class="reference internal" href="#module-papy.graph" title="papy.graph"><tt class="xref py py-mod docutils literal"><span class="pre">papy.graph</span></tt></a><a class="headerlink" href="#papy-graph" title="Permalink to this headline">¶</a></h2>
+<p>This module implements a graph data structure without explicit edges, using 
+nested Python dictionaries. It provides <tt class="docutils literal"><span class="pre">DictNode</span></tt> and <tt class="docutils literal"><span class="pre">DictGraph</span></tt>.</p>
+<dl class="class">
+<dt id="papy.graph.DictGraph">
+<em class="property">class </em><tt class="descclassname">papy.graph.</tt><tt class="descname">DictGraph</tt><big>(</big><em>nodes=()</em>, <em>edges=()</em>, <em>xtras=None</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary-based graph data structure. This graph implementation is a
+little bit unusual as it does not explicitly hold a list of edges. A 
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt> instance is a dictionary, where the keys of the dictionary are 
+hashable <tt class="docutils literal"><span class="pre">object</span></tt> instances (<strong>node objects</strong>), while the values are 
+<tt class="docutils literal"><span class="pre">DictNode</span></tt> instances (<strong>topological nodes</strong>). A <tt class="docutils literal"><span class="pre">DictNode</span></tt> instance is 
+also a dictionary, where the keys are <strong>node objects</strong> and the values are 
+<tt class="docutils literal"><span class="pre">DictNode</span></tt> instances. A <tt class="docutils literal"><span class="pre">Node</span></tt> instance (value) is basically a 
+dictionary of outgoing edges from the <strong>node object</strong> (key). The edges are
+indexed by the incoming objects. So we end up with a single recursivly 
+nested dictionary which defines the topology of the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> instance.
+An edge is a tuple of two <strong>node objects</strong>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>nodes(iterable) [default: <tt class="docutils literal"><span class="pre">()</span></tt>] A sequence of <strong>node objects</strong> 
+to be added to the graph. See: <tt class="docutils literal"><span class="pre">Graph.add_nodes</span></tt></li>
+<li>edges(iterable) [default: <tt class="docutils literal"><span class="pre">()</span></tt>] A sequence of edges to be added to 
+the graph. See: <tt class="docutils literal"><span class="pre">Graph.add_edges</span></tt></li>
+<li>xtras(iterable) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A sequence of property 
+dictionaries for the added <strong>node objects</strong>. The <strong>topological nodes</strong>
+corresponding to the added <strong>node objects</strong> will have their 
+<tt class="docutils literal"><span class="pre">Node.xtra</span></tt> attributes updated with the contents of this sequence. 
+Either all or no <tt class="docutils literal"><span class="pre">&quot;xtra&quot;</span></tt> dictionaries must to be given.</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="papy.graph.DictGraph.add_edge">
+<tt class="descname">add_edge</tt><big>(</big><em>edge</em>, <em>double=False</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.add_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an edge to the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>. An edge is just a pair of <strong>node 
+objects</strong>. If the <strong>node objects</strong> are not in the graph they are 
+created.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>edge(iterable) An ordered pair of <strong>node objects</strong>. The edge is 
+assumed to have a direction from the first to the second <strong>node 
+object</strong>.</li>
+<li>double(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False`</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> the the reverse 
+edge is also added.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.add_edges">
+<tt class="descname">add_edges</tt><big>(</big><em>edges</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.add_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds edges to the graph. Takes optional arguments for 
+<tt class="docutils literal"><span class="pre">DictGraph.add_edge</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>edges(iterable) Sequence of edges to be added to the 
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.add_node">
+<tt class="descname">add_node</tt><big>(</big><em>node</em>, <em>xtra=None</em>, <em>branch=None</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a <strong>node object</strong> to the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>. Returns <tt class="docutils literal"><span class="pre">True</span></tt> if a 
+new <strong>node object</strong> has been added. If the <strong>node object</strong> is already in
+the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> returns <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>node(<tt class="docutils literal"><span class="pre">object</span></tt>) Node to be added. Any hashable Python <tt class="docutils literal"><span class="pre">object</span></tt>.</li>
+<li>xtra(<tt class="docutils literal"><span class="pre">dict</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] The newly created topological 
+<tt class="docutils literal"><span class="pre">Node.xtra</span></tt> dictionary will be updated with the contents of this 
+dictionary.</li>
+<li>branch(<tt class="docutils literal"><span class="pre">object</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] an identificator used to 
+sort topologically equivalent branches.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.add_nodes">
+<tt class="descname">add_nodes</tt><big>(</big><em>nodes</em>, <em>xtras=None</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.add_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds <strong>node objects</strong> to the graph.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>nodes(iterable) Sequence of <strong>node objects</strong> to be added to the 
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt></li>
+<li>xtras(iterable) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] Sequence of <tt class="docutils literal"><span class="pre">Node.xtra</span></tt> 
+dictionaries corresponding to the <strong>node objects</strong> being added. 
+See: <tt class="docutils literal"><span class="pre">Graph.add_node</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.clear_nodes">
+<tt class="descname">clear_nodes</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.clear_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears all nodes in the <em>Graph</em>. See <tt class="docutils literal"><span class="pre">Node.clear</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.cmp_branch">
+<tt class="descname">cmp_branch</tt><big>(</big><em>node1</em>, <em>node2</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.cmp_branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>comparison of <strong>node objects</strong> based on the <tt class="docutils literal"><span class="pre">&quot;branch&quot;</span></tt> attribute of 
+their <strong>topological nodes</strong>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.deep_nodes">
+<tt class="descname">deep_nodes</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.deep_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all reachable <strong>node objects</strong> from a <strong>node object</strong>. See: 
+<tt class="docutils literal"><span class="pre">DictNode.deep_nodes</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>node(<tt class="docutils literal"><span class="pre">object</span></tt>) a <strong>node object</strong> present in the graph.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.del_edge">
+<tt class="descname">del_edge</tt><big>(</big><em>edge</em>, <em>double=False</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.del_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes an edge from the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>. An edge is a pair of <strong>node 
+objects</strong>. The <strong>node objects</strong> are not removed from the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>edge(<tt class="docutils literal"><span class="pre">tuple</span></tt>) An ordered pair of <strong>node objects</strong>. The edge is 
+assumed to have a direction from the first to the second <strong>node 
+object</strong>.</li>
+<li>double(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False`</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> the the reverse
+edge is also removed.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.del_edges">
+<tt class="descname">del_edges</tt><big>(</big><em>edges</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.del_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes edges from the graph. Takes optional arguments for 
+<tt class="docutils literal"><span class="pre">DictGraph.del_edge</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>edges(iterable) Sequence of edges to be removed from the 
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.del_node">
+<tt class="descname">del_node</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.del_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a <strong>node object</strong> from the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>. Returns <tt class="docutils literal"><span class="pre">True</span></tt> if a 
+<strong>node object</strong> has been removed. If the <strong>node object</strong> is not in the
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt> raises a <tt class="docutils literal"><span class="pre">KeyError</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>node(<tt class="docutils literal"><span class="pre">object</span></tt>) <strong>node object</strong> to be removed. Any hashable Python 
+<tt class="docutils literal"><span class="pre">object</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.del_nodes">
+<tt class="descname">del_nodes</tt><big>(</big><em>nodes</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.del_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes <strong>node objects</strong> from the graph.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>nodes(iterable) Sequence of <strong>node objects</strong> to be removed from the
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt>. See: <tt class="docutils literal"><span class="pre">DictGraph.del_node</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.dfs">
+<tt class="descname">dfs</tt><big>(</big><em>node</em>, <em>bucket=None</em>, <em>order='append'</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.dfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursive depth first search. By default (&#8220;order&#8221; = <tt class="docutils literal"><span class="pre">&quot;append&quot;</span></tt>) this 
+returns the <strong>node objects</strong> in the reverse postorder. To change this 
+into the preorder use a <tt class="docutils literal"><span class="pre">collections.deque</span></tt> as &#8220;bucket&#8221; and 
+<tt class="docutils literal"><span class="pre">&quot;appendleft&quot;</span></tt> as &#8220;order&#8221;.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>bucket(<tt class="docutils literal"><span class="pre">list</span></tt> or <tt class="docutils literal"><span class="pre">collections.dequeue</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] The
+user <em>must</em> provide a new <tt class="docutils literal"><span class="pre">list</span></tt> or <tt class="docutils literal"><span class="pre">collections.dequeue</span></tt> to 
+store the nodes.</li>
+<li>order(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">&quot;append&quot;</span></tt>] Method of the &#8220;bucket&#8221; which 
+will be called with the <strong>node object</strong> that has been examined. 
+Other valid options might be <tt class="docutils literal"><span class="pre">&quot;appendleft&quot;</span></tt> for a 
+<tt class="docutils literal"><span class="pre">collections.dequeue</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.edges">
+<tt class="descname">edges</tt><big>(</big><em>nodes=None</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <tt class="docutils literal"><span class="pre">tuple</span></tt> of all edges in the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> an edge is a pair
+of <strong>node objects</strong>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>nodes(iterable) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] iterable of <strong>node objects</strong> if 
+specified the edges will be limited to those outgoing from one of 
+the specified nodes.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.incoming_edges">
+<tt class="descname">incoming_edges</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.incoming_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <tt class="docutils literal"><span class="pre">tuple</span></tt> of incoming edges for a <strong>node object</strong>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>node(<tt class="docutils literal"><span class="pre">object</span></tt>) <strong>node object</strong> present in the graph to be queried 
+for incoming edges.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.iter_nodes">
+<tt class="descname">iter_nodes</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.iter_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator of all <strong>node objects</strong> in the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.node_rank">
+<tt class="descname">node_rank</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.node_rank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum rank for each <strong>topological node</strong> in the 
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt>. The rank of a node is defined as the number of edges 
+between the node and a node which has rank 0. A <strong>topological node</strong> 
+has rank 0 if it has no incoming edges.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.node_width">
+<tt class="descname">node_width</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.node_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the width of each node in the graph. #TODO</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.nodes">
+<tt class="descname">nodes</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all <strong>node objects</strong> in the <tt class="docutils literal"><span class="pre">DictGraph</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.outgoing_edges">
+<tt class="descname">outgoing_edges</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.outgoing_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <tt class="docutils literal"><span class="pre">tuple</span></tt> of outgoing edges for a <strong>node object</strong>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>node(<tt class="docutils literal"><span class="pre">object</span></tt>) <strong>node object</strong> present in the graph to be queried 
+for outgoing edges.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.postorder">
+<tt class="descname">postorder</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.postorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a valid postorder of the <strong>node objects</strong> of the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> 
+<em>if</em> the topology is a directed acyclic graph. This postorder is 
+semi-random, because the order of elements in a dictionary is 
+semi-random and so are the starting nodes of the depth-first search 
+traversal, which determines the postorder, consequently some postorders
+will be discovered more frequently.</p>
+<p>This postorder enforces some determinism on particular ties:</p>
+<blockquote>
+<div><ul class="simple">
+<li>toplogically equivalent branches come first are sorted by length
+(shorter branches come first).</li>
+<li>if the topological Nodes corresponding to the node objects have
+a <tt class="docutils literal"><span class="pre">&quot;branch&quot;</span></tt> attribute it will be used to sort the graph from 
+left to right.</li>
+</ul>
+</div></blockquote>
+<p>However the final postorder is still <em>not</em> deterministic.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictGraph.rank_width">
+<tt class="descname">rank_width</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictGraph.rank_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the width of each rank in the graph. #TODO</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="papy.graph.DictNode">
+<em class="property">class </em><tt class="descclassname">papy.graph.</tt><tt class="descname">DictNode</tt><big>(</big><em>entity=None</em>, <em>xtra=None</em><big>)</big><a class="headerlink" href="#papy.graph.DictNode" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">DictNode</span></tt> is the <strong>topological node</strong> of a <tt class="docutils literal"><span class="pre">DictGraph</span></tt>. Please note 
+that the  <strong>node object</strong> is not the same as the <strong>topological node</strong>. The 
+<strong>node  object</strong> is any hashable Python <tt class="docutils literal"><span class="pre">object</span></tt>. The <strong>topological node</strong>
+is defined for each <strong>node object</strong> and is a dictionary of other <strong>node 
+objects</strong> with incoming <strong>edges</strong> from a single <strong>node object</strong>.</p>
+<p>A node has: <tt class="docutils literal"><span class="pre">&quot;discovered&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;examined&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;branch&quot;</span></tt> attributes.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>entity (<tt class="docutils literal"><span class="pre">object</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] Any hashable <tt class="docutils literal"><span class="pre">object</span></tt> is a 
+valid <strong>node object</strong>.</li>
+<li>xtra (<tt class="docutils literal"><span class="pre">dict</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A dictionary of arbitrary properties
+of the <strong>topological node</strong>.</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="papy.graph.DictNode.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictNode.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the <tt class="docutils literal"><span class="pre">&quot;discovered&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;examined&quot;</span></tt> attributes to <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictNode.deep_nodes">
+<tt class="descname">deep_nodes</tt><big>(</big><em>allnodes=None</em><big>)</big><a class="headerlink" href="#papy.graph.DictNode.deep_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>A recursive method to return a <tt class="docutils literal"><span class="pre">list</span></tt> of <em>all</em> <strong>node objects</strong> 
+connected from this <strong>toplogical node</strong>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictNode.iternodes">
+<tt class="descname">iternodes</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictNode.iternodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator of <strong>node objects</strong> directly connected from this 
+<strong>topological node</strong>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="papy.graph.DictNode.nodes">
+<tt class="descname">nodes</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.graph.DictNode.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of <strong>node objects</strong> directly connected from this 
+<strong>topological node</strong>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-papy.util.codefile"></span><div class="section" id="papy-util-codefile">
+<h2><a class="reference internal" href="#module-papy.util.codefile" title="papy.util.codefile"><tt class="xref py py-mod docutils literal"><span class="pre">papy.util.codefile</span></tt></a><a class="headerlink" href="#papy-util-codefile" title="Permalink to this headline">¶</a></h2>
+<p>Provides template strings for saving <strong>PaPy</strong> pipelines directly as Python 
+source code.</p>
+</div>
+<span class="target" id="module-papy.util.config"></span><div class="section" id="papy-util-config">
+<h2><a class="reference internal" href="#module-papy.util.config" title="papy.util.config"><tt class="xref py py-mod docutils literal"><span class="pre">papy.util.config</span></tt></a><a class="headerlink" href="#papy-util-config" title="Permalink to this headline">¶</a></h2>
+<p>Configures logging to monitor the execution of <strong>PaPy</strong> pipelines and  
+OS-dependent defaults for different variables.</p>
+<dl class="function">
+<dt id="papy.util.config.get_defaults">
+<tt class="descclassname">papy.util.config.</tt><tt class="descname">get_defaults</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.util.config.get_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of variables and their possibly os-dependent defaults.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.config.start_logger">
+<tt class="descclassname">papy.util.config.</tt><tt class="descname">start_logger</tt><big>(</big><em>log_to_file=False</em>, <em>log_to_stream=False</em>, <em>log_to_file_level=20</em>, <em>log_to_stream_level=20</em>, <em>log_filename=None</em>, <em>log_stream=None</em>, <em>log_rotate=True</em>, <em>log_size=524288</em>, <em>log_number=3</em><big>)</big><a class="headerlink" href="#papy.util.config.start_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures and starts a logger to monitor the execution of a <strong>PaPy</strong> 
+pipeline.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>log_to_file(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">True</span></tt>] Should we write logging 
+messages into a file?</li>
+<li>log_to_stream(<tt class="docutils literal"><span class="pre">bool</span></tt> or <tt class="docutils literal"><span class="pre">object</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] Should we 
+print logging messages to a stream? If <tt class="docutils literal"><span class="pre">True</span></tt> this defaults to 
+<tt class="docutils literal"><span class="pre">stderr</span></tt>.</li>
+<li>log_to_file_level(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">INFO</span></tt>] The minimum logging 
+level of messages to be written to file.</li>
+<li>log_to_screen_level(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">ERROR</span></tt>] The minimum logging 
+level of messages to be printed to the stream.</li>
+<li>log_filename(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">&quot;PaPy_log&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;PaPy_log_$TIME$&quot;</span></tt>]
+Name of the log file. Ignored if &#8220;log_to_file&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+<li>log_rotate(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">True</span></tt>] Should we limit the number of 
+logs? Ignored if &#8220;log_to_file&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+<li>log_size(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">524288</span></tt>] Maximum number of <tt class="docutils literal"><span class="pre">bytes</span></tt> 
+saved in a single log file. Ignored if &#8220;log_to_file&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+<li>log_number(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">3</span></tt>] Maximum number of rotated log files
+Ignored if &#8220;log_to_file&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<span class="target" id="module-papy.util.func"></span><div class="section" id="papy-util-func">
+<h2><a class="reference internal" href="#module-papy.util.func" title="papy.util.func"><tt class="xref py py-mod docutils literal"><span class="pre">papy.util.func</span></tt></a><a class="headerlink" href="#papy-util-func" title="Permalink to this headline">¶</a></h2>
+<p>A collection of core functions to use in Worker instances includes functions for
+dealing with inputs/outputs of a pipeline or <tt class="docutils literal"><span class="pre">Pipers</span></tt>. In general these 
+functions are used to connect <tt class="docutils literal"><span class="pre">Pipers</span></tt> to external inputs/outputs (these are 
+the pipeline input/outputs i.e. streams) or to connect them to other <tt class="docutils literal"><span class="pre">Pipers</span></tt> 
+(via items i.e. transformed elements of the input streams). Based on that 
+distinction two types of functions are provided:</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>stream function load or save the input stream from or into a single </dt>
+<dd><p class="first last">file, therefore they can only be used at the beginnings or ends of a 
+pipeline. Stream loaders are not worker functions, as they are called once
+(e.g. with the input file name as the argument) and create the input 
+stream in the form of a generator of input items.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">item functions load, save, process or display data items. These are 
+<tt class="docutils literal"><span class="pre">Worker</span></tt> functions and should be used within <tt class="docutils literal"><span class="pre">Pipers</span></tt>.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>No method of interprocess communication, besides the default inefficient is 
+supported on all platforms. Even among UNIX implementation details forking 
+and can differ.</p>
+<dl class="function">
+<dt id="papy.util.func.dump_item">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">dump_item</tt><big>(</big><em>inbox</em>, <em>type='file'</em>, <em>prefix=None</em>, <em>suffix=None</em>, <em>dir=None</em>, <em>timeout=320</em>, <em>buffer=None</em><big>)</big><a class="headerlink" href="#papy.util.func.dump_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the first element of the inbox as a file of a specified type. The 
+type can be &#8216;file&#8217;, &#8216;fifo&#8217; or &#8216;socket&#8217; corresponding to typical  files, 
+named pipes (FIFOs). FIFOs and TCP sockets and are volatile i.e. exists only
+as long as the Python process, which created them. FIFOs are local i.e.
+allow to communicate processes only on the same computer.</p>
+<p>This function returns a semi-random name of the file written. By default 
+creates files and fifos in the default temporary directory. To use named 
+pipes the operating system has to support both forks and fifos (not 
+Windows). Sockets should work on all operating systems.</p>
+<p>This function is useful to efficently communicate parallel <tt class="docutils literal"><span class="pre">Pipers</span></tt> 
+without the overhead of using queues.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>type(&#8216;file&#8217;, &#8216;fifo&#8217;, &#8216;socket&#8217;) [default: &#8216;file&#8217;] Type of the created 
+file-like object.</li>
+<li>prefix(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">&quot;tmp_papy_%type%&quot;</span></tt>] Prefix of the file to 
+be created. Should probably identify the <tt class="docutils literal"><span class="pre">Worker</span></tt> and <tt class="docutils literal"><span class="pre">Piper</span></tt> type.</li>
+<li>suffix(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">''</span></tt>] Suffix of the file to be created. 
+Should probably identify the format of the serialization protocol e.g. 
+<tt class="docutils literal"><span class="pre">&quot;pickle&quot;</span></tt> or deserialized data e.g. <tt class="docutils literal"><span class="pre">&quot;nubox&quot;</span></tt>.</li>
+<li>dir(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">tempfile.gettempdir()</span></tt>] Directory to safe the
+file to. (can be changed only for types <tt class="docutils literal"><span class="pre">&quot;file&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;fifo&quot;</span></tt>)</li>
+<li>timeout(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">320</span></tt>] Number of seconds to keep the 
+process at the write-end of the <tt class="docutils literal"><span class="pre">&quot;socket&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;pipe&quot;</span></tt> alive.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.dump_pickle_stream">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">dump_pickle_stream</tt><big>(</big><em>inbox</em>, <em>handle</em><big>)</big><a class="headerlink" href="#papy.util.func.dump_pickle_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the first element of the inbox to the provided stream (data handle) 
+as a pickle. To be used with the <tt class="docutils literal"><span class="pre">load_pickle_stream</span></tt> function.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>handle(<tt class="docutils literal"><span class="pre">file</span></tt>) A file handle open for writing.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.dump_stream">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">dump_stream</tt><big>(</big><em>inbox</em>, <em>handle</em>, <em>delimiter=None</em><big>)</big><a class="headerlink" href="#papy.util.func.dump_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the first element of the inbox to the provided stream (file handle) 
+delimiting the input by the optional delimiter string. Returns the name of
+the file being written.</p>
+<p>Note that only a single process can have access to a file handle open for 
+writing. Therefore this function should only be used by a non-parallel 
+<tt class="docutils literal"><span class="pre">Piper</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>handle(<tt class="docutils literal"><span class="pre">file</span></tt>) File handle open for writing.</li>
+<li>delimiter(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A string which will seperate the
+written items. e.g: <tt class="docutils literal"><span class="pre">&quot;END&quot;</span></tt> becomes <tt class="docutils literal"><span class="pre">&quot;\nEND\n&quot;</span></tt> in the output 
+stream. The default is an empty string which means that items will be 
+seperated by a blank line i.e.: <tt class="docutils literal"><span class="pre">&quot;\n\n&quot;</span></tt> (two new-line characters).</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.ipasser">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">ipasser</tt><big>(</big><em>inbox</em>, <em>i=0</em><big>)</big><a class="headerlink" href="#papy.util.func.ipasser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Passes the &#8220;i&#8221;-th input from inbox. By default passes the first input.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>i(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">0</span></tt>]</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.json_dumps">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">json_dumps</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.util.func.json_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serializes the first element of the input using the JSON protocol as 
+implemented by the <tt class="docutils literal"><span class="pre">json</span></tt> Python 2.6 library.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.json_loads">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">json_loads</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.util.func.json_loads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserializes the first element of the input using the JSON protocol as 
+implemented by the <tt class="docutils literal"><span class="pre">json</span></tt> Python 2.6 library.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.load_item">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">load_item</tt><big>(</big><em>inbox</em>, <em>type='string'</em>, <em>remove=True</em>, <em>buffer=None</em><big>)</big><a class="headerlink" href="#papy.util.func.load_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data from a file. Determines the file type automatically <tt class="docutils literal"><span class="pre">&quot;file&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;fifo&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;socket&quot;</span></tt>, but allows to specify the representation type 
+<tt class="docutils literal"><span class="pre">&quot;string&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;mmap&quot;</span></tt> for memory mapped access to the file. Returns 
+the  loaded item as a <tt class="docutils literal"><span class="pre">str</span></tt> or <tt class="docutils literal"><span class="pre">mmap</span></tt> object. Internally creates an item
+from a <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>type(<tt class="docutils literal"><span class="pre">&quot;string&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;mmap&quot;</span></tt>) [default: <tt class="docutils literal"><span class="pre">&quot;string&quot;</span></tt>] Determines the
+type of <tt class="docutils literal"><span class="pre">object</span></tt> the worker returns i.e. the <tt class="docutils literal"><span class="pre">file</span></tt> is read as a 
+string or a memmory map. FIFOs cannot be memory mapped.</li>
+<li>remove(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">True</span></tt>] Should the file be removed from the
+filesystem? This is mandatory for FIFOs and sockets. Only Files can be 
+used to store data persistantly.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.load_pickle_stream">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">load_pickle_stream</tt><big>(</big><em>handle</em><big>)</big><a class="headerlink" href="#papy.util.func.load_pickle_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an object generator from a stream (file handle) containing data
+in pickles. To be used with the <tt class="docutils literal"><span class="pre">dump_pickle_stream</span></tt></p>
+<p>File handles should not be read by different processes.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>handle(<tt class="docutils literal"><span class="pre">file</span></tt>) A file handle open for reading.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.load_stream">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">load_stream</tt><big>(</big><em>handle</em>, <em>delimiter=None</em><big>)</big><a class="headerlink" href="#papy.util.func.load_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a string generator from a stream (file handle) containing data 
+delimited by the delimiter strings. This is a stand-alone function and 
+should be used to feed external data into a pipeline.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>hande(<tt class="docutils literal"><span class="pre">file</span></tt>) A file handle open for reading.</li>
+<li>delimiter(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] The default means that items will
+be separated by two new-line characters i.e.: <tt class="docutils literal"><span class="pre">&quot;\n\n&quot;</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.make_lines">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">make_lines</tt><big>(</big><em>handle</em>, <em>follow=False</em>, <em>wait=0.1</em><big>)</big><a class="headerlink" href="#papy.util.func.make_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a line generator from a stream (file handle) containing data in
+lines.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>follow(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> follows the file after
+it finishes like &#8216;tail -f&#8217;.</li>
+<li>wait(<tt class="docutils literal"><span class="pre">float</span></tt>) [default: <tt class="docutils literal"><span class="pre">0.1</span></tt>] time to wait in seconds between file
+polls.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.njoiner">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">njoiner</tt><big>(</big><em>inbox</em>, <em>n=None</em>, <em>join=''</em><big>)</big><a class="headerlink" href="#papy.util.func.njoiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>String joins and returns the first &#8220;n&#8221; inputs.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>n(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] All elements in the inbox smaller then 
+this number will be joined.</li>
+<li>join(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>] String which will join the elements of 
+the inbox i.e. <tt class="docutils literal"><span class="pre">join.join()</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.npasser">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">npasser</tt><big>(</big><em>inbox</em>, <em>n=None</em><big>)</big><a class="headerlink" href="#papy.util.func.npasser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Passes &#8220;n&#8221; first inputs from inbox. By default passes the whole inbox.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>n(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>]</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.nzipper">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">nzipper</tt><big>(</big><em>inbox</em>, <em>n=None</em><big>)</big><a class="headerlink" href="#papy.util.func.nzipper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zips the &#8220;n&#8221; first inputs from inbox. By default zips thee whole inbox.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>n(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] The default translates to 
+<tt class="docutils literal"><span class="pre">zip(*inbox[:])</span></tt></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.pickle_dumps">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">pickle_dumps</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.util.func.pickle_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serializes the first element of the input using the pickle protocol using
+the fastes binary protocol.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.pickle_loads">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">pickle_loads</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.util.func.pickle_loads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserializes the first element of the input using the pickle protocol.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.plugger">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">plugger</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.util.func.plugger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns nothing.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.print_">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">print_</tt><big>(</big><em>inbox</em><big>)</big><a class="headerlink" href="#papy.util.func.print_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the first element of the inbox.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.sjoiner">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">sjoiner</tt><big>(</big><em>inbox</em>, <em>s=None</em>, <em>join=''</em><big>)</big><a class="headerlink" href="#papy.util.func.sjoiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>String joins input with indices in s.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>s(sequence) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] <tt class="docutils literal"><span class="pre">tuple</span></tt> or <tt class="docutils literal"><span class="pre">list</span></tt> of indices of the
+elements which will be joined.</li>
+<li>join(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: <tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>] String which will join the elements of 
+the inbox i.e. <tt class="docutils literal"><span class="pre">join.join()</span></tt>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.spasser">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">spasser</tt><big>(</big><em>inbox</em>, <em>s=None</em><big>)</big><a class="headerlink" href="#papy.util.func.spasser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Passes inputs with indecies in s. By default passes the whole inbox.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>s(sequence) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] The default translates to a range for
+all inputs of the &#8220;inbox&#8221; i.e. <tt class="docutils literal"><span class="pre">range(len(inbox))</span></tt></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.func.szipper">
+<tt class="descclassname">papy.util.func.</tt><tt class="descname">szipper</tt><big>(</big><em>inbox</em>, <em>s=None</em><big>)</big><a class="headerlink" href="#papy.util.func.szipper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zips inputs from inbox with indicies in &#8220;s&#8221;. By default zips the whole 
+inbox (all indices).</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>s(sequence) [default: <tt class="docutils literal"><span class="pre">None</span></tt>]</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<span class="target" id="module-papy.util.script"></span><div class="section" id="papy-util-script">
+<h2><a class="reference internal" href="#module-papy.util.script" title="papy.util.script"><tt class="xref py py-mod docutils literal"><span class="pre">papy.util.script</span></tt></a><a class="headerlink" href="#papy-util-script" title="Permalink to this headline">¶</a></h2>
+<p>Provides <tt class="docutils literal"><span class="pre">script</span></tt> a <tt class="docutils literal"><span class="pre">Worker</span></tt> function to interect with arbitrary 
+scripts.</p>
+<dl class="function">
+<dt id="papy.util.script.get_config">
+<tt class="descclassname">papy.util.script.</tt><tt class="descname">get_config</tt><big>(</big><em>lang='python'</em><big>)</big><a class="headerlink" href="#papy.util.script.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns language-specific script configuration.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>lang(&#8216;python&#8217;, &#8216;bash&#8217;) which programming language</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.script.script">
+<tt class="descclassname">papy.util.script.</tt><tt class="descname">script</tt><big>(</big><em>inbox</em>, <em>cfg</em><big>)</big><a class="headerlink" href="#papy.util.script.script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute arbitrary scripts.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>cfg(<tt class="docutils literal"><span class="pre">dict</span></tt>) script configuartion dictionary</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="papy.util.script.write_template">
+<tt class="descclassname">papy.util.script.</tt><tt class="descname">write_template</tt><big>(</big><em>fn</em>, <em>lang='python'</em><big>)</big><a class="headerlink" href="#papy.util.script.write_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write language-specific script template to file.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>fn(<tt class="docutils literal"><span class="pre">string</span></tt>) path to save the template to</li>
+<li>lang(&#8216;python&#8217;, &#8216;bash&#8217;) which programming language</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<span class="target" id="module-papy.util.runtime"></span><div class="section" id="papy-util-runtime">
+<h2><a class="reference internal" href="#module-papy.util.runtime" title="papy.util.runtime"><tt class="xref py py-mod docutils literal"><span class="pre">papy.util.runtime</span></tt></a><a class="headerlink" href="#papy-util-runtime" title="Permalink to this headline">¶</a></h2>
+<p>Provides a (possibly shared, but not yet) dictionary.</p>
+<dl class="function">
+<dt id="papy.util.runtime.get_runtime">
+<tt class="descclassname">papy.util.runtime.</tt><tt class="descname">get_runtime</tt><big>(</big><big>)</big><a class="headerlink" href="#papy.util.runtime.get_runtime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a PAPY_RUNTIME dictionary.</p>
+</dd></dl>
+
+</div>
+<span class="target" id="module-numap.NuMap"></span><div class="section" id="numap-numap">
+<h2><a class="reference internal" href="#module-numap.NuMap" title="numap.NuMap"><tt class="xref py py-mod docutils literal"><span class="pre">numap.NuMap</span></tt></a><a class="headerlink" href="#numap-numap" title="Permalink to this headline">¶</a></h2>
+<p>This module provides a parallel (local or remote), buffered, multi-task, lazy
+map function, which can use threads and processes.</p>
+<dl class="class">
+<dt id="numap.NuMap.NuMap">
+<em class="property">class </em><tt class="descclassname">numap.NuMap.</tt><tt class="descname">NuMap</tt><big>(</big><em>func=None</em>, <em>iterable=None</em>, <em>args=None</em>, <em>kwargs=None</em>, <em>worker_type=None</em>, <em>worker_num=None</em>, <em>worker_remote=None</em>, <em>stride=None</em>, <em>buffer=None</em>, <em>ordered=True</em>, <em>skip=False</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">NuMap</span></tt> is a parallel (thread- or process-based, local or remote), 
+buffered, multi-task, <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> or <tt class="docutils literal"><span class="pre">multiprocessing.Pool.imap</span></tt> 
+function replacment. Like <tt class="docutils literal"><span class="pre">imap</span></tt> it evaluates a function on elements of a
+sequence or iterable, and it does so lazily. Laziness can be adjusted via 
+the &#8220;stride&#8221; and  &#8220;buffer&#8221; arguments. Unlike <tt class="docutils literal"><span class="pre">imap</span></tt>, <tt class="docutils literal"><span class="pre">NuMap</span></tt> supports 
+<strong>multiple pairs</strong> of function and iterable <strong>tasks</strong>. The <strong>tasks</strong> are 
+<strong>not</strong> queued rather they are <strong>interwoven</strong> and share a pool or <strong>worker</strong>
+&#8220;processes&#8221; or &#8220;threads&#8221; and a memory &#8220;buffer&#8221;.</p>
+<p><em>Pool</em></p>
+<p>The pool is a set of managed <strong>worker</strong> processes or threads. The choice of 
+the &#8220;worker_type&#8221; has a <strong>fundamental</strong> impact on the performance of the 
+map. As a general rule use &#8220;process&#8221; if you have multiple CPUs or CPU-cores
+and  your task functions are cpu-bound. Use &#8220;thread&#8221; if your function is 
+IO-bound e.g. retrieves data from the Web. Increasing the number of 
+<strong>workers</strong> above the number of CPUs makes sense only if these are &#8220;thread&#8221;
+based <strong>workers</strong> and the evaluated functions are IO-bound. Some CPU-bound 
+tasks might evaluate faster if the number of <strong>worker</strong> processes equals the
+number of CPUs + 1. For &#8220;thread&#8221; based  <tt class="docutils literal"><span class="pre">NuMaps</span></tt> a larger number of 
+<strong>workers</strong> of might improve performance. The &#8220;worker_num&#8221; argument must not
+<strong>not</strong> include workers needed to run remote processes and can be equal 
+<tt class="docutils literal"><span class="pre">0</span></tt> for a purely remote <tt class="docutils literal"><span class="pre">NuMaps</span></tt>.</p>
+<p><em>Iteration</em></p>
+<p>Results are retrieve through iteration. A single <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance supports
+iteration over results from many <strong>tasks</strong>. This means that it supports 
+multiple end-points. The default is to iterate over the results from the 
+first task. An iterator for a single <strong>task</strong> is returned by the 
+<tt class="docutils literal"><span class="pre">NuMap.get_task</span></tt> method.</p>
+<p><em>Order</em></p>
+<p>The tasks can be interdependent i.e. the results from one <strong>task</strong> being the
+input to a second <strong>task</strong>. The order in which <strong>tasks</strong> are added to the 
+<tt class="docutils literal"><span class="pre">NuMap</span></tt> instance is important. It affects the order of evaluation and 
+consequently the order in which results should be retrieved. If the 
+<strong>tasks</strong> are chained then the &#8220;order&#8221; must be a valid topological sort 
+(reverse topological order). If the <tt class="docutils literal"><span class="pre">NuMap</span></tt> is ordered the n-th result for
+a specific <strong>task</strong> the will be always be available before the n+1-th 
+result. If &#8220;order&#8221; is <tt class="docutils literal"><span class="pre">False</span></tt> the results will be available in the order
+they are calculated.</p>
+<p><em>Skipping</em></p>
+<p>The &#8220;skipping&#8221; argument determines how to respond to <tt class="docutils literal"><span class="pre">TimeoutErrors</span></tt> it is
+ignored if no &#8220;timeout&#8221; value is given to the <tt class="docutils literal"><span class="pre">NuMap.next</span></tt> method. If 
+&#8220;skipping&#8221; is <tt class="docutils literal"><span class="pre">True</span></tt> results, which are not calculated on time will be 
+omitted. If &#8220;skip&#8221; <tt class="docutils literal"><span class="pre">False</span></tt> an exception will be raised, but the result can
+be retrieved later. If <strong>tasks</strong> are chained a <tt class="docutils literal"><span class="pre">TimeoutError</span></tt> will 
+collapse the <tt class="docutils literal"><span class="pre">NuMap</span></tt> evaluation. Do <strong>not* specify timeouts in for
+chained **tasks</strong>.</p>
+<p><em>Parallel evaluation</em></p>
+<p>The parallelism of the evaluation is strictly defined by the &#8220;stride&#8221;, 
+&#8220;buffer&#8221; and the total number of <strong>workers</strong> in the pool. The <strong>worker</strong> 
+number is obviously the upper bound of concurrently evaluated elements.
+The maximum number of elements from a single <strong>task</strong> evauluated in 
+parallel is defined by &#8220;stride&#8221;. The &#8220;buffer&#8221; limits the maximum number of
+pending results for all <strong>tasks</strong> it is a function of &#8220;stride&#8221;, but also 
+of the topology of dependencies between the tasks. A long &#8220;stride&#8221; improves 
+parallelism, but increases &#8220;buffer&#8221; memory requirements. It should not be 
+smaller than the number of pool <strong>workers</strong>, because some will be idle. The
+size of the &#8220;buffer&#8221;  is larger or equal to &#8220;stride&#8221; because a <strong>task</strong> 
+might depend on results from multiple up-stream <strong>tasks</strong>.</p>
+<p>The minimum &#8220;stride&#8221; and &#8220;buffer is <tt class="docutils literal"><span class="pre">1</span></tt> therefore the results from the 
+&#8220;buffer&#8221; must be removed in the same order as input elements are evaluated.
+Otherwise the <tt class="docutils literal"><span class="pre">NuMap</span></tt> might dead-lock.</p>
+<p>An element is buffered until it is returned by the <tt class="docutils literal"><span class="pre">NuMap.next</span></tt> method. 
+Starting the <tt class="docutils literal"><span class="pre">NuMap</span></tt> will cause one element (the first from the first 
+<strong>task</strong> to be submitted to the pool. For &#8220;stride&#8221; equal to <tt class="docutils literal"><span class="pre">1</span></tt>, the next
+queued element is the first from the second <strong>task</strong>, which can enter the 
+pool only if either the first result is retrieved (i.e. <tt class="docutils literal"><span class="pre">NuMap.next</span></tt> 
+returns) or the &#8220;buffer&#8221; is larger then the &#8220;stride&#8221;. If the &#8220;buffer&#8221; is 
+<tt class="docutils literal"><span class="pre">n</span></tt> then <tt class="docutils literal"><span class="pre">n</span></tt> tasklets can enter the pool. A &#8220;stride&#8221; of <tt class="docutils literal"><span class="pre">n</span></tt> requires 
+at least <tt class="docutils literal"><span class="pre">n</span></tt> elements to enter the pool, therefore &#8220;buffer&#8221; cannot be 
+smaller then &#8220;stride&#8221;. The &#8220;minimum&#8221; buffer is the maximum possible number
+of queued results. This number depends on the interdependencies between 
+<strong>tasks</strong> and the &#8220;stride&#8221;. The default is conservative and sufficient for 
+all topologies.  If the <strong>tasks</strong> are chained i.e. the output from one is 
+consumed by another thenat most one i-th element from each chained <strong>task</strong>
+is at a given moment in the pool. In those cases the minimum &#8220;buffer&#8221; to 
+satisfy the worst case number of queued results is lower then the safe 
+default.</p>
+<p><em>Stopping</em></p>
+<p>The <tt class="docutils literal"><span class="pre">NuMap</span></tt> can be stopped at any time, however some buffered results 
+might be lost and up to 2 * &#8220;stride&#8221; additional input elements comsumed.
+If pending buffered results are not retrieved the <tt class="docutils literal"><span class="pre">NuMap</span></tt> might not shut
+down properly.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>func (callable) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] If the <tt class="docutils literal"><span class="pre">NuMap</span></tt> is given a function
+it is used to define the first and only task of the <tt class="docutils literal"><span class="pre">NuMap</span></tt></li>
+<li>iterable (iterable) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] a sequence of first arguments 
+for &#8220;func&#8221; required if &#8220;func&#8221; is given</li>
+<li>args (<tt class="docutils literal"><span class="pre">tuple</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] optional, see: <tt class="docutils literal"><span class="pre">NuMap.add_task</span></tt></li>
+<li>kwargs (<tt class="docutils literal"><span class="pre">dict</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] optional, see: <tt class="docutils literal"><span class="pre">NuMap.add_task</span></tt></li>
+<li>worker_type(<tt class="docutils literal"><span class="pre">'process'</span></tt> or <tt class="docutils literal"><span class="pre">'thread'</span></tt>) [default: <tt class="docutils literal"><span class="pre">'process'</span></tt>] 
+Defines the type of internally spawned pool workers. For 
+<tt class="docutils literal"><span class="pre">multiprocessing.Process</span></tt> based worker choose &#8216;process&#8217; for 
+<tt class="docutils literal"><span class="pre">threading.Thread</span></tt> workers choose &#8216;thread&#8217;.</li>
+<li>worker_num(int) [default: number of CPUs, min: 1] The number of workers 
+to spawn locally. Defaults to the number of availble CPUs, which is a 
+reasonable choice for process-based  <tt class="docutils literal"><span class="pre">NuMaps</span></tt>.</li>
+<li>worker_remote(iterable) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A sequence of &#8220;remote host&#8221;
+&#8220;remote worker_num&#8221; tuples e.g.
+<tt class="docutils literal"><span class="pre">(('localhost',</span> <span class="pre">2]),</span> <span class="pre">('127.0.0.1',</span> <span class="pre">2))</span></tt> &#8220;remote worker_num&#8221; is the 
+number of workers processes per remote host. A custom <tt class="docutils literal"><span class="pre">TCP</span></tt> port can 
+be specified <tt class="docutils literal"><span class="pre">(('localhost:6666',2),)</span></tt>.</li>
+<li>stride(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: automatic] number of elements from a <strong>task</strong>
+evaluated in parallel</li>
+<li>buffer(<tt class="docutils literal"><span class="pre">int</span></tt>) [default: automatic] total number number of elements 
+(inputs and results) in the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance</li>
+<li>ordered(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">True</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> the output of all 
+<strong>tasks</strong> will be ordered see: order.</li>
+<li>skip(<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] Should we skip a result if trying to
+retrieve it raised a  <tt class="docutils literal"><span class="pre">TimeoutError</span></tt>?</li>
+<li>name(<tt class="docutils literal"><span class="pre">str</span></tt>) [default: &#8220;imap_id(id(object))&#8221;] an optional name to 
+associate with this <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance. It should be unique. Useful for 
+code generation.</li>
+</ul>
+</div></blockquote>
+<p>Restrictions:</p>
+<blockquote>
+<div><ul class="simple">
+<li>a completely lazy i.e. &#8220;buffer-free&#8221; evaluation is not supported</li>
+<li>if remote workers are enabled, &#8220;worker_type&#8221; has to be the default 
+&#8220;process&#8221;.</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="numap.NuMap.NuMap.add_task">
+<tt class="descname">add_task</tt><big>(</big><em>func</em>, <em>iterable</em>, <em>args=None</em>, <em>kwargs=None</em>, <em>timeout=None</em>, <em>block=True</em>, <em>track=False</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap.add_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a <strong>task</strong> to evaluate. A <strong>task</strong> is jointly a function or 
+callable an iterable with optional arguments and keyworded arguments.
+The iterable can be the result iterator of a previously added <strong>task</strong>
+(to the same or to a different <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance).</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>func (callable) this will be called on each element of the 
+&#8220;iterable&#8221; and supplied with arguments &#8220;args&#8221; and keyworded 
+arguments &#8220;kwargs&#8221;</li>
+<li>iterable (iterable) this must be a sequence of <em>picklable</em> objects 
+which will be the first arguments passed to the &#8220;func&#8221;</li>
+<li>args (<tt class="docutils literal"><span class="pre">tuple</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A <tt class="docutils literal"><span class="pre">tuple</span></tt> of optional 
+constant arguments passed to the callable &#8220;func&#8221; after the first
+argument from the &#8220;iterable&#8221;</li>
+<li>kwargs (<tt class="docutils literal"><span class="pre">dict</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A dictionary of keyworded 
+arguments passed to &#8220;func&#8221; after the variable argument from the 
+&#8220;iterable&#8221; and the arguments from &#8220;args&#8221;</li>
+<li>timeout (<tt class="docutils literal"><span class="pre">bool</span></tt>) see: <tt class="docutils literal"><span class="pre">_NuMapTask</span></tt></li>
+<li>block (<tt class="docutils literal"><span class="pre">bool</span></tt>) see: <tt class="docutils literal"><span class="pre">_NuMapTask</span></tt></li>
+<li>track (<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> the results 
+(or exceptions) of a <strong>task</strong> are saved within:
+<tt class="docutils literal"><span class="pre">self._tasks_tracked[%task_id%]</span></tt> as a <tt class="docutils literal"><span class="pre">{index:result}</span></tt> 
+dictionary. This is only useful if the callable &#8220;func&#8221; creates 
+persistant data. The dictionary can be used to restore the correct 
+order of the data</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="numap.NuMap.NuMap.get_task">
+<tt class="descname">get_task</tt><big>(</big><em>task=0</em>, <em>timeout=None</em>, <em>block=True</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap.get_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator which results are limited to one <strong>task</strong>. The 
+default iterator the one which e.g. will be used in a for loop is the
+iterator for the first task (task =0). The returned iterator is a 
+<tt class="docutils literal"><span class="pre">_NuMapTask</span></tt> instance.</p>
+<p>Compare:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">result_from_task_0</span> <span class="ow">in</span> <span class="n">imap_instance</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">result_from_task_1</span> <span class="ow">in</span> <span class="n">imap_instance</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span> <span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>a typical use case is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">task_0_iterator</span> <span class="o">=</span> <span class="n">imap_instance</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span> <span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">task_1_iterator</span> <span class="o">=</span> <span class="n">imap_instance</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span> <span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">task_1_res</span><span class="p">,</span> <span class="n">task_0_res</span><span class="p">)</span> <span class="ow">in</span> <span class="n">izip</span><span class="p">(</span><span class="n">task_0_iterator</span><span class="p">,</span> <span class="n">task_1_iterator</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="numap.NuMap.NuMap.next">
+<tt class="descname">next</tt><big>(</big><em>timeout=None</em>, <em>task=0</em>, <em>block=True</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next result for the given <strong>task</strong>. Defaults to <tt class="docutils literal"><span class="pre">0</span></tt>, which
+is the first <strong>task</strong>. If multiple chained tasks are evaluated then the
+next method of only the last should be called directly.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>timeout (<tt class="docutils literal"><span class="pre">float</span></tt>) Number of seconds to wait until a 
+<tt class="docutils literal"><span class="pre">TimeoutError</span></tt> is raised.</li>
+<li>task (<tt class="docutils literal"><span class="pre">int</span></tt>) id of the task from the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance</li>
+<li>block (<tt class="docutils literal"><span class="pre">bool</span></tt>) if <tt class="docutils literal"><span class="pre">True</span></tt> call will block until result is 
+available</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="numap.NuMap.NuMap.pop_task">
+<tt class="descname">pop_task</tt><big>(</big><em>number</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap.pop_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a previously added <strong>task</strong> from the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number (<tt class="docutils literal"><span class="pre">int</span></tt> or <tt class="docutils literal"><span class="pre">True</span></tt>) A positive integer specifying the 
+number of <strong>tasks</strong> to pop. If  number is set <tt class="docutils literal"><span class="pre">True</span></tt> all <strong>tasks</strong>
+will be popped.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="numap.NuMap.NuMap.start">
+<tt class="descname">start</tt><big>(</big><em>stages=(1</em>, <em>2)</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the processes or threads in the internal pool and the threads, 
+which manage the <strong>worker pool</strong> input and output queues. The 
+<strong>starting mode</strong> is split into <strong>two stages</strong>, which can be initiated 
+seperately. After the first stage the <strong>worker pool</strong> processes or 
+threads are  started and the <tt class="docutils literal"><span class="pre">NuMap._started</span></tt> event is set <tt class="docutils literal"><span class="pre">True</span></tt>.
+A call to the <tt class="docutils literal"><span class="pre">NuMap.next</span></tt> method <strong>will</strong> block. After the <strong>second 
+stage</strong> the <tt class="docutils literal"><span class="pre">NuMap._pool_putter</span></tt> and <tt class="docutils literal"><span class="pre">NuMap._pool_getter</span></tt> threads
+will be running. The <tt class="docutils literal"><span class="pre">NuMap.next</span></tt> method should only be called <strong>after</strong> 
+this method returns.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>stages (<tt class="docutils literal"><span class="pre">tuple</span></tt>) [default: <tt class="docutils literal"><span class="pre">(1,</span> <span class="pre">2)</span></tt>] Specifies which stages of 
+the start process to execute, by default both stages.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="numap.NuMap.NuMap.stop">
+<tt class="descname">stop</tt><big>(</big><em>ends=None</em>, <em>forced=False</em><big>)</big><a class="headerlink" href="#numap.NuMap.NuMap.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance. If the list of end tasks is specified <em>via</em>
+the &#8220;ends&#8221; argument a call to <tt class="docutils literal"><span class="pre">NuMap.stop</span></tt> will block the calling 
+thread and retrieve (discards) a maximum of 2 * stride of results. This 
+will stop  the worker pool and the threads which manage its input and 
+output queues respectively.</p>
+<p>If the &#8220;ends&#8221; argument is not specified, but the &#8220;forced&#8221; argument is 
+the method does not block and the <tt class="docutils literal"><span class="pre">NuMap._stop</span></tt> has to be called after
+<strong>all</strong> pending results have been retrieved. Calling <tt class="docutils literal"><span class="pre">NuMap._stop</span></tt> with
+pending results <strong>will</strong> dead-lock.</p>
+<p>Either &#8220;ends&#8221; or &#8220;forced&#8221; has to be <tt class="docutils literal"><span class="pre">True</span></tt>.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>ends (<tt class="docutils literal"><span class="pre">list</span></tt>) [default: <tt class="docutils literal"><span class="pre">None</span></tt>] A list of task ids which are not
+consumed within the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance.</li>
+<li>forced (<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If &#8220;ends&#8221; is not <tt class="docutils literal"><span class="pre">None</span></tt> 
+this argument is ignored. If &#8220;ends&#8221; is <tt class="docutils literal"><span class="pre">None</span></tt> and &#8220;forced&#8221; is 
+<tt class="docutils literal"><span class="pre">True</span></tt> the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance will trigger <em>stopping mode</em>.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="numap.NuMap.imports">
+<tt class="descclassname">numap.NuMap.</tt><tt class="descname">imports</tt><big>(</big><em>modules</em>, <em>forgive=False</em><big>)</big><a class="headerlink" href="#numap.NuMap.imports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should be used as a decorator to <em>attach</em> import statments to function
+definitions. These imports are added to the global (i.e. module-level of 
+the decorated function) namespace.</p>
+<p>Two forms of import statements are supported (in the following examples
+<tt class="docutils literal"><span class="pre">foo</span></tt>, <tt class="docutils literal"><span class="pre">bar</span></tt>, <tt class="docutils literal"><span class="pre">oof,</span> <span class="pre">and</span> <span class="pre">``rab</span></tt> are modules not classes or functions):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">foo</span><span class="o">,</span> <span class="nn">bar</span>              <span class="c"># -&gt; @imports([&#39;foo&#39;, &#39;bar&#39;])</span>
+<span class="kn">import</span> <span class="nn">foo.oof</span> <span class="kn">as</span> <span class="nn">oof</span>            
+<span class="kn">import</span> <span class="nn">bar.rab</span> <span class="kn">as</span> <span class="nn">rab</span>        <span class="c"># -&gt; @imports([&#39;foo.oof&#39;, &#39;bar.rab&#39;])</span>
+</pre></div>
+</div>
+<p>It provides support for alternatives:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">foo</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bar</span>
+</pre></div>
+</div>
+<p>which is expressed as:</p>
+<div class="highlight-python"><pre>@imports(['foo,bar'])</pre>
+</div>
+<p>or alternatively:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">foo.oof</span> <span class="kn">as</span> <span class="nn">oof</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bar.rab</span> <span class="kn">as</span> <span class="nn">oof</span>
+</pre></div>
+</div>
+<p>becomes:</p>
+<div class="highlight-python"><pre>@imports(['foo.oof,bar.rab'])</pre>
+</div>
+<p>This import is available in the body of the function as <tt class="docutils literal"><span class="pre">oof</span></tt> All needed
+imports should be attached for every function (even if two function are in
+the same module and have the same <tt class="docutils literal"><span class="pre">globals</span></tt>)</p>
+<p>Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li>modules (<tt class="docutils literal"><span class="pre">list</span></tt>) A list of modules in the following forms 
+<tt class="docutils literal"><span class="pre">['foo',</span> <span class="pre">'bar',</span> <span class="pre">...,</span> <span class="pre">'baz']</span></tt> or  
+<tt class="docutils literal"><span class="pre">['foo.oof',</span> <span class="pre">'bar.rab',</span> <span class="pre">...,</span> <span class="pre">'baz.zab']</span></tt></li>
+<li>forgive (<tt class="docutils literal"><span class="pre">bool</span></tt>) [default: <tt class="docutils literal"><span class="pre">False</span></tt>] If <tt class="docutils literal"><span class="pre">True</span></tt> will not raise 
+<cite>ImportError`</cite></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><strong>PaPy</strong> API</a><ul>
+<li><a class="reference internal" href="#papy-core"><tt class="docutils literal"><span class="pre">papy.core</span></tt></a></li>
+<li><a class="reference internal" href="#papy-graph"><tt class="docutils literal"><span class="pre">papy.graph</span></tt></a></li>
+<li><a class="reference internal" href="#papy-util-codefile"><tt class="docutils literal"><span class="pre">papy.util.codefile</span></tt></a></li>
+<li><a class="reference internal" href="#papy-util-config"><tt class="docutils literal"><span class="pre">papy.util.config</span></tt></a></li>
+<li><a class="reference internal" href="#papy-util-func"><tt class="docutils literal"><span class="pre">papy.util.func</span></tt></a></li>
+<li><a class="reference internal" href="#papy-util-script"><tt class="docutils literal"><span class="pre">papy.util.script</span></tt></a></li>
+<li><a class="reference internal" href="#papy-util-runtime"><tt class="docutils literal"><span class="pre">papy.util.runtime</span></tt></a></li>
+<li><a class="reference internal" href="#numap-numap"><tt class="docutils literal"><span class="pre">numap.NuMap</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="terms.html"
+                        title="previous chapter">Dictionary of terms and definitions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="terms.html" title="Dictionary of terms and definitions"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

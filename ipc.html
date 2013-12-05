@@ -1,0 +1,247 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Inter Process Communication &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="The Produce / Spawn / Consume Idiom" href="psc.html" />
+    <link rel="prev" title="About the Parallelism in PaPy" href="parallelism.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="psc.html" title="The Produce / Spawn / Consume Idiom"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="About the Parallelism in PaPy"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="inter-process-communication">
+<h1>Inter Process Communication<a class="headerlink" href="#inter-process-communication" title="Permalink to this headline">¶</a></h1>
+<p>This chapter deals with the details of inter-process communication (IPC) in
+<strong>PaPy</strong>. By it&#8217;s design <em>PaPy</em> is a rather high-level engine for the execution
+of workflows and the details of inter-process communication are by default
+hidden from the user. This does not mean that it is not possible to influence
+how processes are communicated i.e. synchronize and exchange data. This allows
+for optimization of workflow execution times, but requires some understanding
+of the involved concepts and is done at the cost of generality e.g. knowing that
+two processes will execute on a shared memory UNIX system allows to communicate
+them via pipes (FIFOs), which will skip some computation and computations. This
+section should be read together with the API documentation for
+<tt class="docutils literal"><span class="pre">papy.util.func.dump_item</span></tt> and <tt class="docutils literal"><span class="pre">papy.util.func.load_item</span></tt>. By default in
+<strong>PaPy</strong> interprocess communication happens between <tt class="docutils literal"><span class="pre">Pipers</span></tt> and the
+manager process.</p>
+<div class="section" id="when-does-it-happen">
+<h2>When does it happen?<a class="headerlink" href="#when-does-it-happen" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt> object is assigned to an <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance which uses a
+process/thread pool to parallelize the evaluation. All functions used to create
+a <tt class="docutils literal"><span class="pre">Worker</span></tt> are evaluated in a single call and no IPC is necessary. Two
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> on the other hand might be executed in different processes and on
+different machines running possibly different operating systems. Therefore by
+default <tt class="docutils literal"><span class="pre">Pipers</span></tt> are connected by a <strong>pair</strong> of locked <tt class="docutils literal"><span class="pre">pipe</span></tt> objects via a
+manager process, which is the process used to execute/start the workflow.</p>
+</div>
+<div class="section" id="why-is-it-inefficient">
+<h2>Why is it inefficient?<a class="headerlink" href="#why-is-it-inefficient" title="Permalink to this headline">¶</a></h2>
+<p>Using a manager process to communicate two other process is inefficient as it
+involves two passes of pickling/unpickling and creates a potential bottleneck
+because half of all serialization computation is done by a single intermediate
+process, this obviously will not scale if the number of process to be
+communicated is large. The solutiond are a) bypass the double pipe connection
+and connect processes directly, b) use a more efficient serialization protocol,
+c) eliminate IPC by collapsing multiple <tt class="docutils literal"><span class="pre">Piper</span></tt> instances into a single one.
+We will focus here on the first option, which involves adding dumping(output)
+and loading(input) worker-functions to the <tt class="docutils literal"><span class="pre">Workers</span></tt> instances i.e. in
+pseud-code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">papy</span> <span class="kn">import</span> <span class="n">workers</span>
+<span class="n">upstream</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">((</span><span class="n">func</span><span class="p">,</span> <span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">pickle_dumps</span><span class="p">,</span> <span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dump_item</span><span class="p">),</span>\
+               <span class="p">((),</span>    <span class="p">(),</span>                      <span class="p">(</span><span class="s">&#39;tcp&#39;</span><span class="p">)))</span>
+<span class="n">downstream</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">((</span><span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">load_item</span><span class="p">,</span> <span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">pickle_loads</span><span class="p">,</span> <span class="n">func</span><span class="p">),</span>\
+                <span class="p">((),</span>                    <span class="p">(),</span>                      <span class="p">()))</span>
+<span class="n">up_piper</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">upstream</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span><span class="n">some_IMap_instance</span><span class="p">)</span>
+<span class="n">down_piper</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">downstream</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span><span class="n">some_different_IMap_instance</span><span class="p">)</span>
+<span class="n">pipes</span> <span class="o">=</span> <span class="n">Plumber</span><span class="p">()</span>
+<span class="n">pipes</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">((</span><span class="n">up_piper</span><span class="p">,</span> <span class="n">down_piper</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In this example we created two <em>Worker</em> instances, which are used to create
+<em>Piper</em> instances connected within a <em>Dagger</em> instance and executed by
+different processes possibly on different physical machines. Because of this a
+networked method of communication has been chosen &#8216;tcp&#8217;. This method involves
+sending data over a network socket. Data has to be serialized before it can be
+passed to another process. Within <tt class="docutils literal"><span class="pre">multiprocessing</span></tt> this is done via pickling,
+<em>RPyC</em> uses an internal protocol called brine. <em>PaPy</em> has built-in workers
+which support the pickle, json and marshall protocols. Pickle is the most
+general protocols and most Python objects can be pickled. Currently Json and
+marshall might be faster, but they have limitations (compability between Python
+versions and the range of serializable Python objects). The <tt class="docutils literal"><span class="pre">load_item</span></tt> worker
+will auto discover the type of communication. The currently supported methods of
+communication are &#8216;tcp&#8217; or &#8216;udp&#8217; for network communications, &#8216;fifo&#8217; or &#8216;shm&#8217; to
+communicate processes on the same physical machine and hooks to databases
+currently &#8216;sqlite&#8217; and &#8216;mysql&#8217;. Data can also be exchanged via temporary files
+&#8216;file&#8217;. Temporary files can be used to communicate remote hosts if they are
+accessible from both e.g. via NFS or Samba.</p>
+<div class="section" id="how-does-it-work">
+<h3>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h3>
+<p>If the user decides to use custom communication methods the inefficient
+double-pipe connection is used to transfer only a very small amount of data and
+effectively to synchronize the processes. For example for TCP based
+communication it is the hostname and port and the type of the protocol &#8216;tcp&#8217;.
+For file, shm and FIFO based communication it is just the file name. This amount
+of data will not be a bottleneck for pipelines of any size.</p>
+</div>
+<div class="section" id="how-do-database-hooks-work">
+<h3>How do database &#8220;hooks&#8221; work?<a class="headerlink" href="#how-do-database-hooks-work" title="Permalink to this headline">¶</a></h3>
+<p>The <em>PaPy</em> <tt class="docutils literal"><span class="pre">dump_db_item</span></tt> and <tt class="docutils literal"><span class="pre">load_db_item</span></tt> worker functions allow to
+communicate Python processes via a database. The data in the database can be
+stored only until it is retrieved or persistantly and serve as a way to
+check-point the pipeline. How the data is stored in a database depends on the
+type of the database, currently &#8216;mysql&#8217; and &#8216;sqlite&#8217; databases are supported.
+Sqlite database files should not be shared over NFS, but can be written and read
+by different processes.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">papy</span> <span class="kn">import</span> <span class="n">workers</span>
+<span class="n">upstream</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">((</span><span class="n">func</span><span class="p">,</span> <span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">pickle_dumps</span><span class="p">,</span> <span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dump_db_item</span><span class="p">),</span>\
+                 <span class="p">((),</span>    <span class="p">(),</span>                      <span class="p">(</span><span class="s">&#39;sqlite&#39;</span><span class="p">)))</span>
+<span class="n">downstram</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">((</span><span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">load_db_item</span><span class="p">,</span> <span class="n">workers</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">pickle_loads</span><span class="p">,</span> <span class="n">func</span><span class="p">),</span>\
+                  <span class="p">((),</span>                    <span class="p">(),</span>                         <span class="p">()))</span>
+<span class="n">up_piper</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">upstream</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span><span class="n">some_IMap_instance</span><span class="p">)</span>
+<span class="n">down_piper</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">downstram</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span><span class="n">some_different_IMap_instance</span><span class="p">)</span>
+<span class="n">pipes</span> <span class="o">=</span> <span class="n">Plumber</span><span class="p">()</span>
+<span class="n">pipes</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">((</span><span class="n">up_piper</span><span class="p">,</span> <span class="n">down_piper</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="which-method-should-i-choose">
+<h3>Which method should I choose?<a class="headerlink" href="#which-method-should-i-choose" title="Permalink to this headline">¶</a></h3>
+<p>The recommended method of communication depends whether the processes run on the
+same or different physical machines, what the operating systems of the Python
+processes and the size of the exchanged data. Small lists, objects, strings,
+etc. (the size of up to hundreds of kB after serialization) should be
+transferred using the default method i.e. without using the dump_item worker.
+Only for large objects non-standard communication methods should be considered.
+If the processes run on a shared memory UNIX system you should use FIFOs (pipes)
+or shared memory (this requires the posix_ipx module). Using FIFOs on Windows
+systems is currently not supported (but might be in future) and Windows is not
+POSIX compliant so you are left with files, which might be fast enough for
+typical applications. Files on a network share are also the recommended method
+to communicate Windows-based processes. Networking i.e. &#8216;tcp&#8217; and &#8216;udp&#8217; requires
+forking of the process, which evaluates the <tt class="docutils literal"><span class="pre">dump_item</span></tt> function.  Forking is
+not supported on Windows, but should work well on all UNIX systems. UDP should
+provide higher performance than TCP, but should only be used on reliable,
+collision-less networks. When using UDP you are not guaranteed that all data
+will be transmitted over the network, this will yield WorkerErrors, which in
+turn will require you to re-run the pipeline for failed input items.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Inter Process Communication</a><ul>
+<li><a class="reference internal" href="#when-does-it-happen">When does it happen?</a></li>
+<li><a class="reference internal" href="#why-is-it-inefficient">Why is it inefficient?</a><ul>
+<li><a class="reference internal" href="#how-does-it-work">How does it work?</a></li>
+<li><a class="reference internal" href="#how-do-database-hooks-work">How do database &#8220;hooks&#8221; work?</a></li>
+<li><a class="reference internal" href="#which-method-should-i-choose">Which method should I choose?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parallelism.html"
+                        title="previous chapter">About the Parallelism in <em>PaPy</em></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="psc.html"
+                        title="next chapter">The Produce / Spawn / Consume Idiom</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ipc.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="psc.html" title="The Produce / Spawn / Consume Idiom"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="About the Parallelism in PaPy"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

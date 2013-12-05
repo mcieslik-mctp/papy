@@ -1,0 +1,834 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Architecture &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="About the Parallelism in PaPy" href="parallelism.html" />
+    <link rel="prev" title="Quick Introduction" href="first.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="About the Parallelism in PaPy"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="first.html" title="Quick Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="architecture">
+<h1>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
+<p>The architecture of <strong>PaPy</strong> is remarkably simple and intuitive yet flexible. It
+consists of only four core components (classes) to construct a data processing
+pipeline. Each component provides an isolated subset of the functionality, which
+includes defining the: processing nodes, connectivity and computational
+resources of a workflow and further enables deployment and run-time interactions
+(e.g. monitoring).</p>
+<p><strong>PaPy</strong> is very modular, functions can be used in several places in a
+pipeline or re-used in another pipelines. Computational resources can be
+shared among workflows and processing nodes.</p>
+<p>In this chapter we first introduce object-otiented programming in the context
+of <strong>PaPy</strong>, explain briefly the core components (building blocks). In later
+sections we revisit each component and explain the how and why.</p>
+<div class="section" id="understanding-the-object-oriented-model">
+<h2>Understanding the object-oriented model<a class="headerlink" href="#understanding-the-object-oriented-model" title="Permalink to this headline">¶</a></h2>
+<p><strong>PaPy</strong> is written in an object-oriented(OO) way. The main components: Plumber,
+Dagger, Pipers and Workers are in fact class objects. For the end-user it is
+important to distinguish between classes and class instances. In Python both
+classes and class instances are objects. When you import the module in your
+script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">papy</span>
+</pre></div>
+</div>
+<p>A new object (a module) will be availble i.e. you will be able to access classes
+and functions provided by <strong>PaPy</strong> e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">papy</span><span class="o">.</span><span class="n">SomeClass</span>
+</pre></div>
+</div>
+<p>The name of the imported <tt class="docutils literal"><span class="pre">object</span></tt> will be <tt class="docutils literal"><span class="pre">papy</span></tt>. This object has several
+attributes which correspond to the components and interface of <tt class="docutils literal"><span class="pre">papy</span></tt> e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">papy</span><span class="o">.</span><span class="n">Plumber</span>
+<span class="n">papy</span><span class="o">.</span><span class="n">Dagger</span>
+<span class="n">papy</span><span class="o">.</span><span class="n">Piper</span>
+<span class="n">papy</span><span class="o">.</span><span class="n">Worker</span>
+</pre></div>
+</div>
+<p>Attributes are accessed in Python using the <tt class="docutils literal"><span class="pre">object.attribute</span></tt> notation. These
+components are classes not class instances. They are used to construct class
+instances which correspond to the run-time of the program. A single class can in
+general have multiple instances. A class instance is constructed by &#8220;calling&#8221;
+(in fact initializing) the class i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">class_instance</span> <span class="o">=</span> <span class="n">Class</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The important part is that using <tt class="docutils literal"><span class="pre">papy</span></tt> involves constructing class
+instances.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">worker_instance</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="n">custom_function</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">argument</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+<span class="n">piper_instance</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">worker_instance</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+<span class="n">your_interface</span> <span class="o">=</span> <span class="n">Plumber</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="core-components">
+<h2>core components<a class="headerlink" href="#core-components" title="Permalink to this headline">¶</a></h2>
+<p>The core components form the end-user interface i.e. the classes which the user
+is expected use directly.</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>NuMap - An implementation of an iterated map function which can process</dt>
+<dd><p class="first last">multiple tasks (function-sequence tuples) in parallel using
+either threads or processes on the local machine or on remote
+<strong>RPyC</strong> servers. <tt class="docutils literal"><span class="pre">NuMap</span></tt> instances represent computational
+resources.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Pipers(Workers) - combined define the processing nodes by wrapping</dt>
+<dd><p class="first last">user-defined functions and handling exceptions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Dagger - defines the connectivity of the pipeline in the form of a directed</dt>
+<dd><p class="first last">acyclic graph i.e. the connectivity of the flow (pipes).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Plumber - provides the interface to set-up run and monitor a workflow at</dt>
+<dd><p class="first last">run-time.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="the-numap-class">
+<h2>The <tt class="docutils literal"><span class="pre">NuMap</span></tt> class<a class="headerlink" href="#the-numap-class" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">NuMap</span></tt> class is provided by the separate module <tt class="docutils literal"><span class="pre">numap</span></tt> and is
+described further in the section about parallel and distributed workflows. Here
+it suffices to say that it is an <tt class="docutils literal"><span class="pre">object</span></tt> which models a pool of cumputational
+resources and allows to execute <strong>multiple</strong> functions using a shared pool of
+local or remote of workers. A <tt class="docutils literal"><span class="pre">NuMap</span></tt> can be used in any python code as an
+alternative to <tt class="docutils literal"><span class="pre">multiprocessing.Pool</span></tt> or <tt class="docutils literal"><span class="pre">itertools.imap</span></tt>. For details
+please refer to the documentation and API for <tt class="docutils literal"><span class="pre">numap</span></tt>.</p>
+<p>object provides a method to evaluate a functions on a sequence of changing
+arguments provided with optional positional and keyworded arguments to modify
+the behaviour of the function. Just like <tt class="docutils literal"><span class="pre">multiprocessing.Pool.imap</span></tt> or
+<tt class="docutils literal"><span class="pre">itertools.imap</span></tt> with the key differences that unlike <tt class="docutils literal"><span class="pre">itertools.NuMap</span></tt> it
+evaluates results in parallel. Compared to <tt class="docutils literal"><span class="pre">multiprocessing.Pool.imap</span></tt> it
+supports multiple functions (called tasks), which are evaluated not one after
+another, but in an alternating fashion. <tt class="docutils literal"><span class="pre">NuMap</span></tt> is completely independent from
+<tt class="docutils literal"><span class="pre">PaPy</span></tt> and can be used separately (it is a standalone package).</p>
+<p>evaluation In <tt class="docutils literal"><span class="pre">PaPy</span></tt> the lazy
+<tt class="docutils literal"><span class="pre">imap</span></tt> functions is replaced with a pool implementation <tt class="docutils literal"><span class="pre">NuMap</span></tt>, which
+allows for a parallelizm vs. memory requirements trade-off.</p>
+</div>
+<div class="section" id="the-worker-class">
+<h2>The <tt class="docutils literal"><span class="pre">Worker</span></tt> class<a class="headerlink" href="#the-worker-class" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Worker</span></tt> is a class which is created with a function or multiple functions
+(and the functions arguments) as arguments to the constructor. It is therefore a
+function wrapper. If multiple functions are supplied they are assumed to be
+nested with the last function being the outer most i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">h</span><span class="p">)</span> <span class="ow">is</span> <span class="n">h</span><span class="p">(</span><span class="n">g</span><span class="p">(</span><span class="n">f</span><span class="p">()))</span>
+</pre></div>
+</div>
+<p>If a <tt class="docutils literal"><span class="pre">Worker</span></tt> instance is called this compsite function is evaluated on the
+supplied argument.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">papy</span> <span class="kn">import</span> <span class="n">Worker</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">radians</span><span class="p">,</span> <span class="n">degrees</span>
+<span class="k">def</span> <span class="nf">papy_radians</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">radians</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">papy_degrees</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">degrees</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">worker_instance</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">((</span><span class="n">papy_radians</span><span class="p">,</span> <span class="n">papy_degrees</span><span class="p">))</span>
+<span class="n">worker_instance</span><span class="p">([</span><span class="mf">90.</span><span class="p">])</span>
+<span class="mf">90.0</span>
+</pre></div>
+</div>
+<p>In this example we have created a composite <tt class="docutils literal"><span class="pre">Worker</span></tt> from two functions
+<tt class="docutils literal"><span class="pre">papy_radians</span></tt> and <tt class="docutils literal"><span class="pre">papy_degrees</span></tt>. The first function converts degrees to
+radians the second converts radians to degrees. Obviously if those two functions
+are nested their result is identical to their input. <tt class="docutils literal"><span class="pre">papy_radians</span></tt> is
+evaluated first and <tt class="docutils literal"><span class="pre">papy_degrees</span></tt> second so the result is in degrees.</p>
+<p>The <tt class="docutils literal"><span class="pre">Worker</span></tt> performs several functions:</p>
+<blockquote>
+<div><ul class="simple">
+<li>standarizes the inputs and outputs of nodes.</li>
+<li>allows to reuse and combine multiple functions into as single node</li>
+<li>catches and wraps exceptions raised within functions.</li>
+<li>allows functions to be evaluated on remote hosts.</li>
+</ul>
+</div></blockquote>
+<p>A <tt class="docutils literal"><span class="pre">Worker</span></tt> expects that the wrapped function has a defined input and output
+signature. The input is expected to be boxed in a tuple relative to the output,
+which should not be boxed. For example the <tt class="docutils literal"><span class="pre">Worker</span></tt> instance expects
+<tt class="docutils literal"><span class="pre">[item]</span></tt>, but returns just <tt class="docutils literal"><span class="pre">item</span></tt>. Any function which conforms to this is a
+valid Worker function. Most built-in functions need to be wrapped. Please refer
+to the API documentation and examples on how to write Worker functions.</p>
+<p>If an exception is raised within any of the user written functions it is cought
+by the <tt class="docutils literal"><span class="pre">Worker</span></tt>, but is <strong>not</strong> raised, instead it is wrapped as a
+<tt class="docutils literal"><span class="pre">WorkerError</span></tt> exception and returned.</p>
+<p>The functionality of a <tt class="docutils literal"><span class="pre">Worker</span></tt> instance is defined by the functions it is
+composed of and their arguments. Two <tt class="docutils literal"><span class="pre">Workers</span></tt> which are composed of the same
+functions <strong>and</strong> are called with the same arguments are functionally identical
+and a single <tt class="docutils literal"><span class="pre">Worker</span></tt> instance could replace them i.e. be used in multiple
+places of a pipeline or in other words in multiple <tt class="docutils literal"><span class="pre">Piper</span></tt> instances.</p>
+<p>The functions within a <tt class="docutils literal"><span class="pre">Worker</span></tt> instance might not be evaluated by the same
+process as the process that created (and calls) the <tt class="docutils literal"><span class="pre">Worker</span></tt> instance. This is
+accomplished by the <strong>RPyC</strong> package and <tt class="docutils literal"><span class="pre">multiprocessing</span></tt> module. A
+<tt class="docutils literal"><span class="pre">Worker</span></tt> knows how to inject its functions into a <strong>RPyC</strong> <tt class="docutils literal"><span class="pre">connection</span></tt>
+instance, after this the worker method will called in the local process,
+but the wrapped functions on the remote host.</p>
+<blockquote>
+<div>import rpyc # import the RPyC module
+from papy import Worker
+power = Worker(pow, (2,)) # power of two
+power([2]) # evaluated locally
+4
+conn = rpyc.classic.connect(&#8220;some_host&#8221;)
+power._incject(conn) # replace pow with remot pow
+power([3]) # evaluated remotely
+9</div></blockquote>
+<p>A function can run on the remote host i.e. remote Python process/thread only if
+the modules on which this function depends are availble on that host and they
+are imported. <tt class="docutils literal"><span class="pre">NuMap</span></tt> provides means to attach import statements to function
+definitions using the <tt class="docutils literal"><span class="pre">imports</span></tt> decorator. In this way code sent to the remote
+host will work if the imported module is availble remotely.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@imports</span><span class="p">([</span><span class="s">&#39;re&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">match_string</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+    <span class="n">unboxed</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">unboxed</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above example shows a valid worker function with the equivalent of the
+import statment attached.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">re</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">re</span></tt> module will be availble remotely in the namespace of this function
+i.e. other injected functions might not have access to <tt class="docutils literal"><span class="pre">re</span></tt>. For more
+informations see the <tt class="docutils literal"><span class="pre">NuMap</span></tt> documentation.</p>
+</div>
+<div class="section" id="built-in-worker-functions">
+<h2>Built-in worker functions<a class="headerlink" href="#built-in-worker-functions" title="Permalink to this headline">¶</a></h2>
+<p>Several classes of <tt class="docutils literal"><span class="pre">Worker</span></tt> functions are already part of <strong>PaPy</strong>. This
+collection is expected to grow, currently the following types of workers are included.</p>
+<blockquote>
+<div><ul class="simple">
+<li>core - basic data-flow</li>
+<li>io - serialisation, printing and file operations</li>
+</ul>
+</div></blockquote>
+<p>These are available in the <tt class="docutils literal"><span class="pre">papy.util.func</span></tt> module. This includes the family
+of passer functions. They do not alter the incoming data, but are used to pass
+only streams from certain imput pipes. For example a <tt class="docutils literal"><span class="pre">Piper</span></tt> connected to
+<tt class="docutils literal"><span class="pre">3</span></tt> other Pipers might propagate input from only one.</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">ipasser</span></tt> - propagates the &#8220;i&#8221;th input pipe</li>
+<li><tt class="docutils literal"><span class="pre">npasser</span></tt> - propagates the &#8220;n&#8221;-first input pipes</li>
+<li><tt class="docutils literal"><span class="pre">spasser</span></tt> - propagetes the pipes with numbers in &#8220;s&#8221;</li>
+</ul>
+</div></blockquote>
+<p>For example:</p>
+<div class="highlight-python"><pre>from papy.util.func import *
+worker = Worker(ipasser, (0,)) # passes only the first pipe
+worker = Worker(ipasser, (1,)) # passes only the second pipe
+worker = Worker(npasser, (2,)) # passes the first two pipes
+worker = Worker(spasser, ((0,1),) # passes pipes 0 and 1
+worker = Worker(spasser, ((1,0),) # passes pipes 1 and 0</pre>
+</div>
+<p>The output of the passes is a <em>single</em> tuple of the passed pipes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">input0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">input1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">]</span>
+
+<span class="n">worker</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="n">spasser</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="c"># will produce output</span>
+<span class="p">[(</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Functions dealing with input/output relations i.e. data storage and
+serialization currently allow serialization using the pickle and JSON protocols
+and file-based data storage.</p>
+<p>Data serialization is a way to convert objects (and in Python almost everything
+is an object) into a sequence, which can be stored or transmitted. <strong>PaPy</strong> uses
+the <tt class="docutils literal"><span class="pre">pickle</span></tt> serialization format to transmit data between local processes and
+<tt class="docutils literal"><span class="pre">brine</span></tt> (an internal serialization protocol from <tt class="docutils literal"><span class="pre">RPyC</span></tt>) to transmit data
+between hosts. The user might however want to save and load data in a different
+format.</p>
+</div>
+<div class="section" id="writing-functions-for-workers">
+<h2>Writing functions for Workers<a class="headerlink" href="#writing-functions-for-workers" title="Permalink to this headline">¶</a></h2>
+<p>A worker is an instance of the class Worker. Worker instaces are created by
+calling the Worker class with a function or several functions as the argument.
+optionally an argument set (for the function) or argument sets (for multiple
+functions) can be supplied i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">worker_instance</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">argument</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">worker_instance</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="n">list_of_functions</span><span class="p">,</span> <span class="n">list_of_arguments</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A worker instance is therefore defined by two elements: the function or list of
+functions and the argument or list of arguments. This means that two different
+instances which have been initialized using the same functions <em>and</em> respecitve
+arguments are functionally equal. You should think of worker instances as nested
+curried functions (search for &#8220;partial application&#8221;).</p>
+<p>Writing functions suitable for workers is very easy and adapting existing
+functions should be the same. The idea is that any function is valid if it
+conforms to a defined input/output scheme. There are only few rules which need to
+be followed:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>The first input argument: each function in a worker will be given a n-tuple
+of objects, where n is the number input iterators to the Worker. For example
+a function which sums two numbers should expect a tuple of lenght 2.
+Remember python uses 0-based counting. If the Worker has only one input
+stream the input to the function will still be a tuple i.e. a 1-tuple.</li>
+<li>The additional (and optional) input arguments: a function can
+be given additional arguments.</li>
+<li>The output: a function should return a single object _not_ enclosed in a
+wrapping 1-tuple. If a python function has no explicit return value it
+implicitly returns None.</li>
+</ol>
+</div></blockquote>
+<p>Examples:</p>
+<p>single input, single ouput:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">water_to_water</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">inp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>single input, no explicit output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">water_to_null</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+  <span class="n">null</span> <span class="o">=</span> <span class="n">inp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>multiple input, single output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">water_and_wine</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+  <span class="n">juice</span> <span class="o">=</span> <span class="n">inp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">inp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">juice</span>
+</pre></div>
+</div>
+<p>multiple input, single output, parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">water_and_wine_dilute</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">dilute</span> <span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+  <span class="n">juice</span> <span class="o">=</span> <span class="n">inp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">dilute</span> <span class="o">+</span> <span class="n">inp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">juice</span>
+</pre></div>
+</div>
+<p>Note that in the last exemples inp is a 2-tuple i.e. the Piper based on such a
+worker/function will expect two input streams or in other words will have two
+incoming pipes. If on the other hand we would like to combine elements in the
+input/object from a single pipe we have to define a function like the
+following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">sum2elements</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+    <span class="n">unwrapped_inp</span> <span class="o">=</span> <span class="n">inp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">unwrapped_inp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">unwrapped_inp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>In other words the function receives a wrapped object but returns an unwrapped.
+All python objects can be used as results except Excptions. This is because
+Exceptions are not evaluated down-stream but are passively propagated.</p>
+</div>
+<div class="section" id="writing-functions-for-output-workers">
+<h2>Writing functions for output workers<a class="headerlink" href="#writing-functions-for-output-workers" title="Permalink to this headline">¶</a></h2>
+<p>An output worker is a worker, which is used in a piper instance at the end of
+a pipeline i.e. in the last piper.  Any valid worker function is also a valid
+output worker function, but it is recommended for the last piper to persistently
+safe the output of the pipeline. The output worker function should therefore
+store it&#8217;s input in a file, database or eventually print it on screen. The
+function should not return data. The reason for this recommendation are related
+to the implementation details of the IMap and Plumber objects.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>The Plumber instance runs a pipeline by retrieving results from output
+pipers <em>without</em> saving or returning those results</li>
+<li>The IMap instance will retrieve results from the output pieprs <em>without</em>
+saving whenever it is told to stop <em>before</em> it consumed all input.</li>
+</ol>
+</div></blockquote>
+<p>The latter point requires some explanation. When the stop method of a running
+IMap instance is called the IMap does not stop immediately, but is schedeuled to
+stop after the current stride is finished for all tasks. To do this the output
+of the pipeline has to be &#8216;cleared&#8217; which means that results from output pipers
+are retrieved, but not stored. Therefore the &#8216;storage&#8217; should be a built-in
+function of the last piper. An output worker function might therefore require an
+argument which is a connection to some persistent storage e.g. a file-handle.</p>
+</div>
+<div class="section" id="the-piper-class">
+<h2>The <tt class="docutils literal"><span class="pre">Piper</span></tt> class<a class="headerlink" href="#the-piper-class" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt> instance represents a node in the directed graph of the workflow.
+It defines what function(s) should at this node be evaluated (via the supplied
+<tt class="docutils literal"><span class="pre">Worker</span></tt> instance) and how they should be evaluated (via the optional
+<tt class="docutils literal"><span class="pre">NuMap</span></tt> instance, which defines the uses computational resources). Besides
+that it performs additional functions which include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>logging and reporting</li>
+<li>exception handling</li>
+<li>timeouts</li>
+<li>produce/spawn/consume schemes</li>
+</ul>
+</div></blockquote>
+<p>To use a <tt class="docutils literal"><span class="pre">Piper</span></tt> outside a workflow three steps are required:</p>
+<blockquote>
+<div><ul class="simple">
+<li>creation - requires a <tt class="docutils literal"><span class="pre">Worker</span></tt> instance, optional arguments e.g. a
+<tt class="docutils literal"><span class="pre">NuMap</span></tt>  instance. (<tt class="docutils literal"><span class="pre">__init__</span></tt> method)</li>
+<li>connection - connects the <tt class="docutils literal"><span class="pre">Piper</span></tt> to the input. (<tt class="docutils literal"><span class="pre">connect</span></tt> method)</li>
+<li>start - allows the <tt class="docutils literal"><span class="pre">Piper</span></tt> to return results, starts the evaluation in
+<tt class="docutils literal"><span class="pre">NuMap</span></tt>. (<tt class="docutils literal"><span class="pre">start</span></tt> method)</li>
+</ul>
+</div></blockquote>
+<p>In the first step we define the <tt class="docutils literal"><span class="pre">Worker</span></tt> which will be evaluated by the
+<tt class="docutils literal"><span class="pre">Piper</span></tt> and the <tt class="docutils literal"><span class="pre">NuMap</span></tt> resource to do this computation. Computational
+resources are represented by <tt class="docutils literal"><span class="pre">NuMap</span></tt> instances. An <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance can
+utilize local or remote threads or processes. If no <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance is given
+to the constructor the <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> function will be used instead. This
+function will be called by the Python process used to construct and start the
+<strong>PaPy</strong> pipeline.</p>
+<p><strong>PaPy</strong> has been designed to monitor the execution of a workflow by logging at
+multiple levels and with a level of detail which can be specified. It uses the
+built-in Python logging (the <tt class="docutils literal"><span class="pre">logging</span></tt> module). The <tt class="docutils literal"><span class="pre">NuMap</span></tt> function, which
+should at this  stage be bug free logs only DEBUG statements. Exceptions within
+<tt class="docutils literal"><span class="pre">Worker</span></tt> functions are wrapped as <tt class="docutils literal"><span class="pre">WorkerError</span></tt> exceptions, these errors are
+logged by the <tt class="docutils literal"><span class="pre">Piper</span></tt> instance, which wraps this <tt class="docutils literal"><span class="pre">Worker</span></tt> (a single
+<tt class="docutils literal"><span class="pre">Worker</span></tt> instance can be used by multiple <tt class="docutils literal"><span class="pre">Pipers</span></tt>). By default the pipeline
+is robust to <tt class="docutils literal"><span class="pre">WorkerErrors</span></tt> and these exceptions are logged, but they do not
+stop the flow. In this mode if the called <tt class="docutils literal"><span class="pre">Worker</span></tt> instance returns a
+<tt class="docutils literal"><span class="pre">WorkerError</span></tt> the calling <tt class="docutils literal"><span class="pre">Piper</span></tt> instance wraps this error as a
+<tt class="docutils literal"><span class="pre">PiperError</span></tt> and <strong>returns</strong> (not raises) it downstream into the pipeline. On
+the other end if a <tt class="docutils literal"><span class="pre">Worker</span></tt> receives a <tt class="docutils literal"><span class="pre">PiperError</span></tt> as input it just
+propagates it further downstream i.e. it does not try meaningless calculations
+on exceptions. In this way errors in the pipeline propagate downstream as place
+holder <tt class="docutils literal"><span class="pre">PiperErrors</span></tt>.</p>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt> instance evaluates the <tt class="docutils literal"><span class="pre">Worker</span></tt> either by the supplied <tt class="docutils literal"><span class="pre">NuMap</span></tt>
+instance (described elswhere) or by the builtin <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> function
+(default). In reality after a <tt class="docutils literal"><span class="pre">Piper</span></tt> is connected to the input it creates a
+task i.e. function, data, arguments <tt class="docutils literal"><span class="pre">tuples</span></tt>, which are added to the <tt class="docutils literal"><span class="pre">NuMap</span></tt>
+instance used to call the imap function.</p>
+<p><tt class="docutils literal"><span class="pre">NuMap</span></tt> instances support timeouts via the optional timeout argument supplied to the
+next method. If the <tt class="docutils literal"><span class="pre">NuMap</span></tt> is not able to return a result within the specified
+time it raises a TimeoutError. This exception is cought by the <tt class="docutils literal"><span class="pre">Piper</span></tt> instance
+which expects the result, wrapped into a PiperError exception and propagated
+down-stream exactly like WorkerErrors. If the <tt class="docutils literal"><span class="pre">Piper</span></tt> is used within a pipeline
+and a timeout argument given the skipping argument should be set to true
+otherwise the number of results from a <tt class="docutils literal"><span class="pre">Piper</span></tt> will be bigger then the number of
+tasklets, which will hang the pipeline.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># valid with or without timeouts</span>
+<span class="n">universal_piper</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">worker_instance</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span><span class="n">imap_instance</span><span class="p">,</span> <span class="n">skipping</span> <span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># valid only with timeouts</span>
+<span class="n">nontimeout_piper</span> <span class="o">=</span> <span class="n">Piper</span><span class="p">(</span><span class="n">worker_instance</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span><span class="n">imap_instance</span><span class="p">,</span> <span class="n">skipping</span> <span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the timeouts specified here are &#8216;computation time&#8217; timeouts. If for
+example a worker function waits for a server response and the server response
+does not arrive within some timeout (which can be an argument for the Worker)
+then if this exception is raise within the function it will be wrapped into a
+WorkerError and raturned not raised as TimeoutErrors.</p>
+<p>A single <tt class="docutils literal"><span class="pre">Piper</span></tt> instance can only be used once within a pipeline (this is
+unlike <tt class="docutils literal"><span class="pre">Worker</span></tt> instances). <tt class="docutils literal"><span class="pre">Pipers</span></tt> are created first and connected to the
+input data later. The latter is accomplished by their <tt class="docutils literal"><span class="pre">connect</span></tt> method.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">piper_instance</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the <tt class="docutils literal"><span class="pre">Piper</span></tt> is used within a <strong>PaPy</strong> pipeline i.e. a <tt class="docutils literal"><span class="pre">Dagger</span></tt> or
+<tt class="docutils literal"><span class="pre">Plumber</span></tt> instance the user does not have to care about connecting individual
+<tt class="docutils literal"><span class="pre">Pipers</span></tt>. A <tt class="docutils literal"><span class="pre">Piper</span></tt> can only be started or disconnected if it has been
+connected before.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">piper_instance</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+<span class="n">piper_instance</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+<span class="c"># or</span>
+<span class="n">piper_instance</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>After starting a <tt class="docutils literal"><span class="pre">Piper</span></tt> the tasks are submitted to the thread/process workers
+in the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance and they are evaluated. This is a process that
+continues until either the memory &#8220;buffer&#8221; is filled or the input is consumed.
+Therefore a <tt class="docutils literal"><span class="pre">Piper``cannot</span> <span class="pre">be</span> <span class="pre">simply</span> <span class="pre">disconnected</span> <span class="pre">when</span> <span class="pre">it</span> <span class="pre">is</span> <span class="pre">&quot;running&quot;.</span> <span class="pre">A</span>
+<span class="pre">special</span> <span class="pre">method</span> <span class="pre">is</span> <span class="pre">needed</span> <span class="pre">to</span> <span class="pre">tell</span> <span class="pre">the</span> <span class="pre">``NuMap</span></tt> instance to stop input
+consumption. Because <tt class="docutils literal"><span class="pre">NuMap</span></tt> instances are shared among <tt class="docutils literal"><span class="pre">Pipers</span></tt> such a
+stop can only occur at &#8220;stride&#8221; boundaries, which are batches of data traversing
+the workflow. The <tt class="docutils literal"><span class="pre">Piper</span></tt> stop method will eventually stop the <tt class="docutils literal"><span class="pre">NuMap</span></tt>
+instance and put the <tt class="docutils literal"><span class="pre">Piper</span></tt> in a stopped state that allows the <tt class="docutils literal"><span class="pre">Piper</span></tt> to
+be disconnected.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">piper_instance</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">piper_instance</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+<span class="n">piper_instance</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span> <span class="c"># can be connected and started</span>
+</pre></div>
+</div>
+<p>Because the stop happens at &#8220;stride&#8221; boundary data is not lost during a stop.
+This can be illustraded as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#           plus2            plus1</span>
+<span class="c"># [1,2,3,4] -----&gt; [3,4,5,6] -----&gt; [4,5,6,7]</span>
+<span class="c"># which is equivalent to the following:</span>
+<span class="c"># plus1(plus2([1,2,3,4])</span>
+</pre></div>
+</div>
+<p>If the <tt class="docutils literal"><span class="pre">Pipers</span></tt> <tt class="docutils literal"><span class="pre">plus2</span></tt> and <tt class="docutils literal"><span class="pre">plus1</span></tt> share a single <tt class="docutils literal"><span class="pre">NuMap</span></tt> and the
+&#8220;stride&#8221; is <tt class="docutils literal"><span class="pre">2</span></tt> then the order of evaluation can be (if the results are
+retrieved):</p>
+<div class="highlight-python"><pre>temp1 = plus2(1)
+temp2 = plus2(2)
+plus1(temp1)
+plus1(temp2)
+&lt;&lt;return&gt;&gt;
+&lt;&lt;return&gt;&gt;
+temp1 = plus2(3)
+temp2 = plus2(4)
+plus1(temp1)
+plus1(temp2)
+&lt;&lt;return&gt;&gt;
+&lt;&lt;return&gt;&gt;</pre>
+</div>
+<p>Now let&#8217;s assume the the stop method has been called just after <tt class="docutils literal"><span class="pre">plus2(1)</span></tt>. We
+do not want to loose the <tt class="docutils literal"><span class="pre">temp1</span></tt> result (as <tt class="docutils literal"><span class="pre">1</span></tt> has been already consumed
+from the input iterator and iterators cannot rewind), but we can achieve this
+only if <tt class="docutils literal"><span class="pre">plus1(temp1)</span></tt> is evaluated this in turn (due to the order of e
+valuation) can happen only after <tt class="docutils literal"><span class="pre">plus2(2)</span></tt> has been evaluated (i.e. <tt class="docutils literal"><span class="pre">2</span></tt>
+consumed from the input iterator). To not loose <tt class="docutils literal"><span class="pre">temp2</span></tt> <tt class="docutils literal"><span class="pre">plus1(temp2)</span></tt> has
+to be evaluated and finally the evaluation can stop.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">temp1</span> <span class="o">=</span> <span class="n">plus2</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">temp2</span> <span class="o">=</span> <span class="n">plus2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plus1</span><span class="p">(</span><span class="n">temp1</span><span class="p">)</span>
+<span class="n">plus1</span><span class="p">(</span><span class="n">temp2</span><span class="p">)</span>
+<span class="p">(</span><span class="n">stopped</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After the stop method returns all worker processes/threads and helper threads
+return (join) and the user can close the Python interpreter.</p>
+<p>It is <strong>very</strong> important to realize what happens with the two calculated
+results. As has been already mentioned a proper <strong>PaPy</strong> pipeline should have
+an output <tt class="docutils literal"><span class="pre">Piper</span></tt> i.e. a one that persistently stores the result.</p>
+</div>
+<div class="section" id="the-dagger">
+<h2>The <tt class="docutils literal"><span class="pre">Dagger</span></tt><a class="headerlink" href="#the-dagger" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> is an object to connect <tt class="docutils literal"><span class="pre">Piper</span></tt> instances into a directed
+acyclic graph (DAG). It inherits most methods of the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> object, which
+is a concise implementation of a graph data-structure. The <tt class="docutils literal"><span class="pre">DictGraph</span></tt>
+instance is a dictionary of arbitary hashable objects i.e. the &#8220;object nodes&#8221;
+e.g. a <tt class="docutils literal"><span class="pre">Piper</span></tt>. The values for the objects are instances of the <tt class="docutils literal"><span class="pre">Node</span></tt> class
+i.e. &#8220;topological nodes&#8221;. A &#8220;topological node&#8221; instance is a also dictionary of
+&#8220;object nodes&#8221; and their corresponding &#8220;topological nodes&#8221;. An &#8220;object node&#8221;(A)
+of the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> is contained in a &#8220;topological node&#8221; corresponding to
+another &#8220;object node&#8221;(B) if there exist an edge from (A) to (B). A and B might
+even be the same &#8220;object node&#8221; (self-loop). A &#8220;topological node&#8221; is therefore a
+sub-graph of the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> instance centered around a &#8220;object node&#8221; and the
+whole <tt class="docutils literal"><span class="pre">DictGraph</span></tt> is a recursively nested dictionary. The <tt class="docutils literal"><span class="pre">Dagger</span></tt> is
+designed to store <tt class="docutils literal"><span class="pre">Piper</span></tt> instances as &#8220;object nodes&#8221; and provides additional
+methods, whereas the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> makes no assumptions about the <tt class="docutils literal"><span class="pre">object</span></tt>
+type.</p>
+<div class="section" id="edges-vs-pipes">
+<h3>Edges vs. pipes<a class="headerlink" href="#edges-vs-pipes" title="Permalink to this headline">¶</a></h3>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt> instance is created by specifiying a <tt class="docutils literal"><span class="pre">Worker</span></tt> (and optionally
+<tt class="docutils literal"><span class="pre">NuMap</span></tt> instance) and needs to be connected to an input. The input might be
+another <tt class="docutils literal"><span class="pre">Piper</span></tt> or any Python iterator. The output of a <tt class="docutils literal"><span class="pre">Piper</span></tt> (upstream)
+can be consumed by several <tt class="docutils literal"><span class="pre">Pipers</span></tt> (downstream), while a <tt class="docutils literal"><span class="pre">Piper</span></tt>
+(downstream) might consume the results of multiple <tt class="docutils literal"><span class="pre">Pipers</span></tt> (upstream). This
+allows <tt class="docutils literal"><span class="pre">Pipers</span></tt> to be used as arbitrary nodes in a directed acyclic graph the
+<tt class="docutils literal"><span class="pre">Dagger</span></tt>.</p>
+<p>To be precise the direction of the edges is opposite
+to the direction of the data stream (pipes). Upstream <tt class="docutils literal"><span class="pre">Pipers</span></tt> have incomming
+edges from downstream <tt class="docutils literal"><span class="pre">Pipers</span></tt> this is represented as a pipe with a opposite
+orientation i.e. upstream -&gt; downstream.</p>
+<p>As a result of the above it is much more natural to think of connections between
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> in terms of data-flow upstream &#8211;&gt; downstream (data flows from
+upstream to downstream) then dependency downstream &#8211;&gt; upstream (downstream
+depends on upstream). The <tt class="docutils literal"><span class="pre">DictGraph</span></tt> represents dependancy information as
+directed edges (downstream &#8211;&gt; upstream), while the <tt class="docutils literal"><span class="pre">Dagger</span></tt> class introduces
+the concept of pipes to ease the understanding of <strong>PaPy</strong> and make mistakes
+less common. A pipe is nothing else then a reversed edge. To make this
+explicit:</p>
+<div class="highlight-python"><pre>input -&gt; piper0 -&gt; piper1 -&gt; output # -&gt; represents a pipe (data-flow)
+input &lt;- piper0 &lt;- piper1 &lt;- output # &lt;- represents an edge (dependancy)</pre>
+</div>
+<p>The data is stored internally as edges, but the interface uses pipes. Method
+names are explicit.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dagger_instance</span><span class="o">.</span><span class="n">add_edge</span><span class="p">()</span> <span class="c"># inherited expects and edge as input</span>
+<span class="n">dagger_instance</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">()</span> <span class="c"># expecs a pipe as input</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although all <tt class="docutils literal"><span class="pre">DictGraph</span></tt> methods are availble from the <tt class="docutils literal"><span class="pre">Dagger</span></tt> the
+end-user should use <tt class="docutils literal"><span class="pre">Dagger</span></tt> specific methods. For example the
+<tt class="docutils literal"><span class="pre">DictGraph</span></tt> method <tt class="docutils literal"><span class="pre">add_edge</span></tt> will allow to add any edge to the
+instance, whereas <tt class="docutils literal"><span class="pre">add_pipe</span></tt> method will not allow to introduce cycles.</p>
+</div>
+</div>
+<div class="section" id="working-with-the-dagger">
+<h3>Working with the <tt class="docutils literal"><span class="pre">Dagger</span></tt><a class="headerlink" href="#working-with-the-dagger" title="Permalink to this headline">¶</a></h3>
+<p>Creation of the a <tt class="docutils literal"><span class="pre">Dagger</span></tt> instance is very easy. An empty <tt class="docutils literal"><span class="pre">Dagger</span></tt> instance
+is created without any arguments to the constructor.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dagger_instance</span> <span class="o">=</span> <span class="n">Dagger</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Optionally a set of <tt class="docutils literal"><span class="pre">Pipers</span></tt> and/or pipes can be given:</p>
+<div class="highlight-python"><pre>dagger_instance = Dagger(sequence_of_pipers, sequence_of_pipes)
+# which is equivalent to:
+dagger_instance.add_pipers(sequence_of_pipers)
+dagger_instance.add_pipes(sequence_of_pipes)
+# a sequence of pipers allows to easily add branches
+dagger_instance.add_pipers([1, 2a, 3a, 4])
+dagger_instance.add_pipers([1, 2b, 3b, 4])
+# in this example a Dagger will have 6 pipers (1, 2a, 2b, 3a, 3b, 4), one
+# branch point 1, one merge point 4, and two branches (2a, 3a) and (2b, 3b).</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> allows to add/delete <tt class="docutils literal"><span class="pre">Pipers</span></tt> and pipes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dagger_instance</span><span class="o">.</span><span class="n">add_piper</span><span class="p">(</span><span class="sb">``</span><span class="n">Piper</span><span class="sb">``</span><span class="p">)</span>
+<span class="n">dagger_instance</span><span class="o">.</span><span class="n">del_piper</span><span class="p">(</span><span class="sb">``</span><span class="n">Piper</span><span class="sb">``</span> <span class="ow">or</span> <span class="n">piper_id</span><span class="p">)</span>
+<span class="n">dagger_instance</span><span class="o">.</span><span class="n">add_pipers</span><span class="p">(</span><span class="n">pipers</span><span class="p">)</span>
+<span class="n">dagger_instance</span><span class="o">.</span><span class="n">del_pipers</span><span class="p">(</span><span class="n">pipers</span> <span class="ow">or</span> <span class="n">piper_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The id of a <tt class="docutils literal"><span class="pre">Piper</span></tt> is a run-time specific number associated with a given
+<tt class="docutils literal"><span class="pre">Piper</span></tt> instance. This number can be obtained by calling the built-in function
+id:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">id</span><span class="p">(</span><span class="sb">``</span><span class="n">Piper</span><span class="sb">``</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This number is also shown when a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance is printed.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">piper_instance</span>
+</pre></div>
+</div>
+<p>or represented:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">repr</span><span class="p">(</span><span class="n">piper_instance</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The representation of a <tt class="docutils literal"><span class="pre">Dagger</span></tt> instance also shows the id of the <tt class="docutils literal"><span class="pre">Pipers</span></tt>
+which are contained in the workflow.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">dagger_instance</span>
+</pre></div>
+</div>
+<p>The id of a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance is define at run-time (it corresponds to the
+memory address of the object) therefore it should not be used in scripts or
+saved in  any way. Note that the lenght of this number is platform-specific and
+that no guarantee is made that two <tt class="docutils literal"><span class="pre">Pipers</span></tt> with non-overlapping will not have
+the same id. The resolve method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dagger_instance</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="sb">``</span><span class="n">Piper</span><span class="sb">``</span> <span class="ow">or</span> <span class="n">piper_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>returns a <tt class="docutils literal"><span class="pre">Piper</span></tt> instance if the supplied <tt class="docutils literal"><span class="pre">Piper</span></tt> or a <tt class="docutils literal"><span class="pre">Piper</span></tt> with the
+supplied id is contained in the dagger_instance. This method by default raises a
+<tt class="docutils literal"><span class="pre">DaggerError</span></tt> if the <tt class="docutils literal"><span class="pre">Piper</span></tt> is not found. If the argument forgive is <tt class="docutils literal"><span class="pre">True</span></tt>
+the method returns <tt class="docutils literal"><span class="pre">None</span></tt> instead:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dagger_instance</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">missing_piper</span><span class="p">)</span> <span class="c"># raise DaggerError</span>
+<span class="n">dagger_instance</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">missing_piper</span><span class="p">,</span> <span class="n">forgive</span> <span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># returns None</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-dagger-run-time">
+<h3>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> run-time<a class="headerlink" href="#the-dagger-run-time" title="Permalink to this headline">¶</a></h3>
+<p>The run-time of a <tt class="docutils literal"><span class="pre">Dagger</span></tt> instance begins when it&#8217;s start method is called.
+A <tt class="docutils literal"><span class="pre">Dagger</span></tt> can only be started if it is connected. Connecting a <tt class="docutils literal"><span class="pre">Dagger</span></tt>
+means to connect all <tt class="docutils literal"><span class="pre">Pipers</span></tt> which it contains as defined by the pipes in the
+<tt class="docutils literal"><span class="pre">Dagger</span></tt>. After the <tt class="docutils literal"><span class="pre">Dagger</span></tt> is connected it can be started, starting a <tt class="docutils literal"><span class="pre">Dagger</span></tt>
+means to start all it&#8217;s <tt class="docutils literal"><span class="pre">Pipers</span></tt>. <tt class="docutils literal"><span class="pre">Pipers</span></tt> have to be started in the order of
+the data-flow i.e. a <tt class="docutils literal"><span class="pre">Piper</span></tt> can only be started after all it&#8217;s up-stream
+<tt class="docutils literal"><span class="pre">Pipers</span></tt> have been started. An ordering of nodes / <tt class="docutils literal"><span class="pre">Pipers</span></tt> of a graph / <tt class="docutils literal"><span class="pre">Dagger</span></tt>
+which has this property is called a postorder. There are possibly more then one
+postorder per graph <tt class="docutils literal"><span class="pre">Dagger</span></tt>. The exact postorder used to connect the <tt class="docutils literal"><span class="pre">Pipers</span></tt>
+has some additional properties</p>
+<blockquote>
+<div><ul class="simple">
+<li>all down-stream <tt class="docutils literal"><span class="pre">Pipers</span></tt> for a <tt class="docutils literal"><span class="pre">Piper</span></tt> (A) come before the next <tt class="docutils literal"><span class="pre">Piper</span></tt>
+(B) for which no such relationship can be established. This can be thought
+as maintaining branch contiguity.</li>
+<li>such branches can additionally be sorted according to the branch argument
+passed to the <tt class="docutils literal"><span class="pre">Piper</span></tt> constructor.</li>
+</ul>
+</div></blockquote>
+<p>Another aspect of order of a <tt class="docutils literal"><span class="pre">Dagger</span></tt> is the sequence by which a down-stream
+<tt class="docutils literal"><span class="pre">Piper</span></tt> connects multiple up-stream <tt class="docutils literal"><span class="pre">Pipers</span></tt>. The inputs cannot be sorted
+based solely on their postorder because the down-stream <tt class="docutils literal"><span class="pre">Piper</span></tt> might be
+connected directly to a <tt class="docutils literal"><span class="pre">Piper</span></tt> to which one of it&#8217;s other inputs has been
+connected before. The inputs of a <tt class="docutils literal"><span class="pre">Piper</span></tt> are additionaly sorted so that all
+down-stream <tt class="docutils literal"><span class="pre">Pipers</span></tt> come before up-stream <tt class="docutils literal"><span class="pre">Pipers</span></tt>, while <tt class="docutils literal"><span class="pre">Pipers</span></tt> for which no
+such relation can be established are still sorted according to their index in
+the postorder. This can be thought of as sorting branches by their &#8220;generation&#8221;.</p>
+<p>You could
+think of a workflow as an <tt class="docutils literal"><span class="pre">imap</span></tt> function composed  from nested <tt class="docutils literal"><span class="pre">imap</span></tt> functions i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># nested imaps as pipelines</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">imap</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">izip</span><span class="p">([</span><span class="n">imap</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">input_for_f</span><span class="p">),</span> <span class="n">imap</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">input_for_g</span><span class="p">)]))</span>
+</pre></div>
+</div>
+<p>This is a pipeline of <tt class="docutils literal"><span class="pre">3</span></tt> functions <tt class="docutils literal"><span class="pre">f</span></tt>, <tt class="docutils literal"><span class="pre">g</span></tt>, <tt class="docutils literal"><span class="pre">h</span></tt>. Functions <tt class="docutils literal"><span class="pre">f</span></tt> and
+<tt class="docutils literal"><span class="pre">g</span></tt> are upstream relative to <tt class="docutils literal"><span class="pre">h</span></tt>. Because of the <tt class="docutils literal"><span class="pre">izip</span></tt> function
+input_for_f and input_for_g have to be of the same lenght.</p>
+<p>A started <tt class="docutils literal"><span class="pre">Dagger</span></tt> is able to process input data. The simplest way to process
+all inputs is to zip it&#8217;s output <tt class="docutils literal"><span class="pre">Pipers</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">output_pipers</span> <span class="o">=</span> <span class="n">dagger_instance</span><span class="o">.</span><span class="n">get_outputs</span><span class="p">()</span>
+<span class="n">final_results</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">output_pipers</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If any of the <tt class="docutils literal"><span class="pre">Pipers</span></tt> used within a <tt class="docutils literal"><span class="pre">Dagger</span></tt> uses an <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance and the
+<tt class="docutils literal"><span class="pre">Dagger</span></tt> is started. The Python process can only be exited cleanly if the
+<tt class="docutils literal"><span class="pre">Dagger</span></tt> instance is stopped by calling it&#8217;s <cite>stop</cite> method.</p>
+</div>
+</div>
+<div class="section" id="the-plumber">
+<h2>The <tt class="docutils literal"><span class="pre">Plumber</span></tt><a class="headerlink" href="#the-plumber" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Plumber</span></tt> is an easy to use interface to <strong>PaPy</strong>. It inherits from the
+<tt class="docutils literal"><span class="pre">Dagger</span></tt> object and can be used like a <tt class="docutils literal"><span class="pre">Dagger</span></tt>, but the <tt class="docutils literal"><span class="pre">Plumber</span></tt> class
+adds  methods related to the &#8220;run time&#8221; of a pipeline. A <tt class="docutils literal"><span class="pre">Plumber</span></tt> can
+start/run/pause/stop a pipeline and additionally load and save a workflow (not
+implemented) A <strong>PaPy</strong> workflow is loaded and saved as executable Python code,
+which has the  same priviliges as the Python process. Please keep this in mind
+starting workflows from untrusted sources!</p>
+</div>
+<div class="section" id="the-additional-components">
+<h2>The additional components<a class="headerlink" href="#the-additional-components" title="Permalink to this headline">¶</a></h2>
+<p>Those classes and functions are used by the core components, but are general and
+might find application in your code.</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">DictGraph``(``Node</span></tt>) - Two classes which implement a graph data-structure
+using a recursively nested dictionary. This allows for simplicity of
+algorithms/methods i.e. there are no edge objects because edges are the keys
+of the <tt class="docutils literal"><span class="pre">Node</span></tt> dictionary which in turn is the value in the dictionary for
+the arbitrary object in the <tt class="docutils literal"><span class="pre">DictGraph</span></tt> instance i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">papy</span> <span class="kn">import</span> <span class="n">Graph</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+<span class="n">object1</span> <span class="o">=</span> <span class="s">&#39;1&#39;</span>
+<span class="n">object2</span> <span class="o">=</span> <span class="s">&#39;2&#39;</span>
+<span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">((</span><span class="n">object1</span><span class="p">,</span> <span class="n">object2</span><span class="p">))</span>
+<span class="n">node_for_object1</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">object1</span><span class="p">]</span>
+<span class="n">node_for_object2</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">object2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> is a <tt class="docutils literal"><span class="pre">DictGraph</span></tt> object with directed edges only and no
+cycles.</p>
+</li>
+<li><p class="first">imports - a function wrapper, which allows to inject import statments to
+a functions local namespace at creation (code execution) e.g. on a remote
+Python process.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Architecture</a><ul>
+<li><a class="reference internal" href="#understanding-the-object-oriented-model">Understanding the object-oriented model</a></li>
+<li><a class="reference internal" href="#core-components">core components</a></li>
+<li><a class="reference internal" href="#the-numap-class">The <tt class="docutils literal"><span class="pre">NuMap</span></tt> class</a></li>
+<li><a class="reference internal" href="#the-worker-class">The <tt class="docutils literal"><span class="pre">Worker</span></tt> class</a></li>
+<li><a class="reference internal" href="#built-in-worker-functions">Built-in worker functions</a></li>
+<li><a class="reference internal" href="#writing-functions-for-workers">Writing functions for Workers</a></li>
+<li><a class="reference internal" href="#writing-functions-for-output-workers">Writing functions for output workers</a></li>
+<li><a class="reference internal" href="#the-piper-class">The <tt class="docutils literal"><span class="pre">Piper</span></tt> class</a></li>
+<li><a class="reference internal" href="#the-dagger">The <tt class="docutils literal"><span class="pre">Dagger</span></tt></a><ul>
+<li><a class="reference internal" href="#edges-vs-pipes">Edges vs. pipes</a></li>
+<li><a class="reference internal" href="#working-with-the-dagger">Working with the <tt class="docutils literal"><span class="pre">Dagger</span></tt></a></li>
+<li><a class="reference internal" href="#the-dagger-run-time">The <tt class="docutils literal"><span class="pre">Dagger</span></tt> run-time</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-plumber">The <tt class="docutils literal"><span class="pre">Plumber</span></tt></a></li>
+<li><a class="reference internal" href="#the-additional-components">The additional components</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="first.html"
+                        title="previous chapter">Quick Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parallelism.html"
+                        title="next chapter">About the Parallelism in <em>PaPy</em></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/architecture.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parallelism.html" title="About the Parallelism in PaPy"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="first.html" title="Quick Introduction"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

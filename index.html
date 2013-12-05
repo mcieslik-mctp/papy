@@ -1,1 +1,287 @@
-My GitHub Page
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PaPy - Parallel Pipelines in Python &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="#" />
+    <link rel="next" title="Introduction" href="bullets.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bullets.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="papy-parallel-pipelines-in-python">
+<h1><strong>PaPy</strong> - Parallel Pipelines in Python<a class="headerlink" href="#papy-parallel-pipelines-in-python" title="Permalink to this headline">¶</a></h1>
+<p>A parallel pipeline is a workflow, which consists of a series of connected
+processing steps to model computational processes and automate their execution
+in parallel on a single multi-core computer or an ad-hoc grid.</p>
+<p>You will find <strong>PaPy</strong> useful if you need to design and deploy a scalable data
+processing workflow that depends on Python libraries or external tools.
+<strong>PaPy</strong> makes it reasonably easy to convert existing code bases into proper
+workflows.</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>project page:</dt>
+<dd><p class="first last"><a class="reference external" href="http://code.google.com/p/papy/">http://code.google.com/p/papy/</a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>repository lives at:</dt>
+<dd><p class="first last"><a class="reference external" href="http://papy.googlecode.com/svn/trunk/papy">http://papy.googlecode.com/svn/trunk/papy</a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>most recent documentation sources:</dt>
+<dd><p class="first last"><a class="reference external" href="http://papy.googlecode.com/svn/trunk/papy/doc/source/">http://papy.googlecode.com/svn/trunk/papy/doc/source/</a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>author email:</dt>
+<dd><p class="first last"><a class="reference external" href="mailto:mpc4p&#37;&#52;&#48;virginia&#46;edu">mpc4p<span>&#64;</span>virginia<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>This documentation covers the design, implementation and usage of <strong>PaPy</strong>. It
+consists of a hand-written manual and an API-reference. Please refer also to the
+rich comments in the source code, examples, workflows and test cases (all
+included in the source-code distribution).</p>
+<p><tt class="docutils literal"><span class="pre">NuMap</span></tt> is a parallel (thread- or process-based, local or remote),
+buffered, multi-task, <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> or <tt class="docutils literal"><span class="pre">multiprocessing.Pool.imap</span></tt>
+function replacment. Like <tt class="docutils literal"><span class="pre">imap</span></tt> it evaluates a function on elements of a
+sequence or iterable, and it does so lazily. Laziness can be adjusted via
+the &#8220;stride&#8221; and &#8220;buffer&#8221; arguments. Unlike <tt class="docutils literal"><span class="pre">imap</span></tt>, <tt class="docutils literal"><span class="pre">NuMap</span></tt> supports
+<strong>multiple pairs</strong> of function and iterable <strong>tasks</strong>. The <strong>tasks</strong> are
+<strong>not</strong> queued rather they are <strong>interwoven</strong> and share a pool or <strong>worker</strong>
+&#8220;processes&#8221; or &#8220;threads&#8221; and a memory &#8220;buffer&#8221;.</p>
+<p>The package is tested on Python 2.7+</p>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bullets.html">Bullet Points</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bullets.html#feature-summary">Feature summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bullets.html#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bullets.html#where-when-should-papy-be-used">Where/When should <strong>PaPy</strong> be used?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bullets.html#where-when-should-papy-not-be-used">Where/When should <strong>PaPy</strong> <strong>not</strong> be used?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-papy-the-easy-way">Installing <strong>PaPy</strong> the easy way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-papy-the-fancy-way">Installing <strong>PaPy</strong> the fancy way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#develop-papy">Develop <strong>PaPy</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="first.html">First Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="first.html#the-workflow-graph">The Workflow Graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first.html#workflow-execution">Workflow Execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first.html#creating-a-workflow">Creating a workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">PaPy Architecture Explained</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#understanding-the-object-oriented-model">Understanding the object-oriented model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#core-components">core components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-numap-class">The <tt class="docutils literal"><span class="pre">NuMap</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-worker-class">The <tt class="docutils literal"><span class="pre">Worker</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#built-in-worker-functions">Built-in worker functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#writing-functions-for-workers">Writing functions for Workers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#writing-functions-for-output-workers">Writing functions for output workers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-piper-class">The <tt class="docutils literal"><span class="pre">Piper</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-dagger">The <tt class="docutils literal"><span class="pre">Dagger</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-plumber">The <tt class="docutils literal"><span class="pre">Plumber</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-additional-components">The additional components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parallelism.html">Parallelism Explained</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#map-basics">Map basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#a-pipeline-is-a-nested-imap">A pipeline is a nested imap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#the-task-and-the-tasklet">The task and the tasklet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#imaps-parallelism-is-defined-by-a-stride">IMaps parallelism is defined by a stride</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#imap-needs-tasks-in-the-right-order">IMap needs tasks in the right order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#imap-can-limit-the-memory-consumption">IMap can limit the memory consumption.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#parallel-local-vs-remote-and-threads-vs-processes">Parallel: local vs. remote and threads vs. processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#if-the-order-of-the-results-is-not-important">If the order of the results is not important</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#timeouts-and-skipping">Timeouts and skipping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelism.html#the-parallel-stride-revisited">The parallel stride revisited</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ipc.html">Inter-Process Communication Explained</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ipc.html#when-does-it-happen">When does it happen?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipc.html#why-is-it-inefficient">Why is it inefficient?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="psc.html">The Produce / Spawn / Consume Idiom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime.html">Runtime (Logging, Interaction, Errors and Timeouts)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="runtime.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runtime.html#interaction-with-the-plumber">Interaction with the Plumber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runtime.html#errors-and-exceptions">Errors and Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runtime.html#dealing-with-timeouts">Dealing with Timeouts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization and Tweaking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#identifying-bottlenecks">Identifying bottlenecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#understanding-bottlenecks">Understanding bottlenecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#unordered-pipers">Unordered Pipers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nubio.html">PaPy for Bioinformatics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Complete Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="issues.html">Known Issues</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="issues.html#papy-in-the-interactive-interpreter">PaPy in the Interactive Interpreter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="issues.html#object-picklability">Object Picklability</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terms.html">Terms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#map">map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#imap">imap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#numap">NuMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#worker-function">Worker function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#worker-process-thread">worker process / thread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#worker">Worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#piper">Piper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#dagger">Dagger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#plumber">Plumber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#input-stream">input stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#output-stream">output stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#item">item</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#input-piper">input Piper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#output-piper">output Piper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#lazy-evaluation">lazy evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#task">task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terms.html#inbox">inbox</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Application Programming Interface (API)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-core"><tt class="docutils literal"><span class="pre">papy.core</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-graph"><tt class="docutils literal"><span class="pre">papy.graph</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-util-codefile"><tt class="docutils literal"><span class="pre">papy.util.codefile</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-util-config"><tt class="docutils literal"><span class="pre">papy.util.config</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-util-func"><tt class="docutils literal"><span class="pre">papy.util.func</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-util-script"><tt class="docutils literal"><span class="pre">papy.util.script</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#papy-util-runtime"><tt class="docutils literal"><span class="pre">papy.util.runtime</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#numap-numap"><tt class="docutils literal"><span class="pre">numap.NuMap</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><strong>PaPy</strong> - Parallel Pipelines in Python</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bullets.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bullets.html" title="Introduction"
+             >next</a> |</li>
+        <li><a href="#">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Known Issues &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="FAQ" href="faq.html" />
+    <link rel="prev" title="Workflows" href="workflows.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="FAQ"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="workflows.html" title="Workflows"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="known-issues">
+<h1>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="papy-in-the-interactive-interpreter">
+<h2>PaPy in the Interactive Interpreter<a class="headerlink" href="#papy-in-the-interactive-interpreter" title="Permalink to this headline">¶</a></h2>
+<p>Parallel features of <strong>PaPy</strong> do <strong>not</strong> work in the interactive interpreter.
+This is a limitation of the Python <tt class="docutils literal"><span class="pre">multiprocessing</span></tt> module.</p>
+<p>This means that <strong>PaPy</strong> workflows can be created, manipulated, tested and run
+from within the interactive interpreter freely as long as they do not use the
+parallel or remote evaluation.</p>
+<p>Code snippets, examples and use cases are not meant to be typed into the
+interactive interpreter console. They should be run from the command line:</p>
+<div class="highlight-python"><pre>$ python example_file.py</pre>
+</div>
+<p>The reason for this is that functions defined in the interactive interpreter
+will not work (and will hang Python) if passed into <tt class="docutils literal"><span class="pre">NuMap</span></tt> instances!  A
+Python function can only be communicated to multiple processes if it can be
+serialized i.e. pickled. This is not possible if the function is in the same
+namespace as a child process (created using the multiprocessing library).</p>
+</div>
+<div class="section" id="object-picklability">
+<h2>Object Picklability<a class="headerlink" href="#object-picklability" title="Permalink to this headline">¶</a></h2>
+<p>Objects are submitted to the worker-threads by means of queues to
+worker-processes by pipes and to remote processes using sockets. This requires
+serialization, which is internally done by the cPickle module. Additionally RPyC
+uses it&#8217;s own &#8216;brine&#8217; for serialization. The submitted objects include the
+functions, data, arguments and keyworded arguments all of which need to be
+picklable!</p>
+<div class="section" id="worker-methods-are-impossible">
+<h3>Worker-methods are impossible<a class="headerlink" href="#worker-methods-are-impossible" title="Permalink to this headline">¶</a></h3>
+<p>Class instances (i.e. Worker instances) are picklable only if all of their
+attributes are.  On the other hand class instance methods are not picklable
+(because they are not top-level module functions) therefore class methods
+(either static, class, bound or unbound) will not work for a parallel piper.</p>
+</div>
+<div class="section" id="file-handles-make-remotely-no-sense">
+<h3>File-handles make remotely no sense<a class="headerlink" href="#file-handles-make-remotely-no-sense" title="Permalink to this headline">¶</a></h3>
+<p>Function arguments should be picklable, but file-handles are not. It is
+recommeded that output pipers store data persistently, therfore output workers
+should be run locally and not use a parallel IMap, circumventing the requirement
+for picklable attributes.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Known Issues</a><ul>
+<li><a class="reference internal" href="#papy-in-the-interactive-interpreter">PaPy in the Interactive Interpreter</a></li>
+<li><a class="reference internal" href="#object-picklability">Object Picklability</a><ul>
+<li><a class="reference internal" href="#worker-methods-are-impossible">Worker-methods are impossible</a></li>
+<li><a class="reference internal" href="#file-handles-make-remotely-no-sense">File-handles make remotely no sense</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="workflows.html"
+                        title="previous chapter">Workflows</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="faq.html"
+                        title="next chapter">FAQ</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/issues.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="FAQ"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="workflows.html" title="Workflows"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,630 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>About the Parallelism in PaPy &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="Inter Process Communication" href="ipc.html" />
+    <link rel="prev" title="Architecture" href="architecture.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ipc.html" title="Inter Process Communication"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="about-the-parallelism-in-papy">
+<h1>About the Parallelism in <em>PaPy</em><a class="headerlink" href="#about-the-parallelism-in-papy" title="Permalink to this headline">¶</a></h1>
+<p>This document explains and gives code snippets how to use the parallel features
+of <em>PaPy</em>. The first paragraphs introduce the <tt class="docutils literal"><span class="pre">map</span></tt> and <tt class="docutils literal"><span class="pre">imap</span></tt> functions and
+the <em>IMap</em> object.  The types of parallelism, are explained in the later
+sections where also typical optimizations, bottlenecks of pipelines are covered.</p>
+<p>Parallel functionality is provided by the <em>IMap</em> class. In the most basic mode
+of operation it can be called exactly like <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> or the
+<tt class="docutils literal"><span class="pre">multiprocessing</span></tt> <em>Pool</em> <tt class="docutils literal"><span class="pre">imap</span></tt> method. Setting additional options allows to
+parallelise the evaluation using <em>Workers</em> of threads, processes or remote
+processes and share those workers among multiple functions and inputs. A unique
+feature of IMap is that it allows to fine-tune the memory-consumption,
+parallelism and layziness trade-off of nested function maps.</p>
+<p><strong>The interpreter will hang on exit if a pipeline does not finish or is halted
+abnormaly</strong></p>
+<p>The Python interpreter exits (returns) if all spawned threads or forked
+processes return. <em>PaPy</em> uses multiple threads to manage the pipeline and
+evaluates functions in seperate threads or processes. All of them need to be
+stopped before the parent python process can return. This is done
+automatically whenever a pipeline finishes or some expected exception
+occurs, in all other cases it is required that the user stops the pipeline
+manually.</p>
+<div class="section" id="map-basics">
+<h2>Map basics<a class="headerlink" href="#map-basics" title="Permalink to this headline">¶</a></h2>
+<p>A map function applies a function to the items of a sequence. This is in
+Python expressed with the following syntax:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+
+<span class="n">inp_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">out_list</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">inp_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting output is [1, 4, 9, 16]. Though unmatched in simplicity this
+function has several computational drawbacks.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>results are evaluated sequentially i.e. power(1), power(2), power(3), power(4)
+and on a single processor.</li>
+<li>The function returns only after <em>all</em> results have been calculated.</li>
+<li>The list of results has to fit into memory together with the input.</li>
+<li>The results are always returned in order.</li>
+</ol>
+</div></blockquote>
+<p>The last two issues can be addressed by using the imap (iterated map) function.
+Its usage is almost as simple:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">imap</span>
+<span class="n">inp_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">out_iterator</span> <span class="o">=</span> <span class="n">imap</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">inp_list</span><span class="p">)</span>
+<span class="n">first_result</span> <span class="o">=</span> <span class="n">out_iterator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>  <span class="c"># returns power(1)</span>
+<span class="n">second_result</span> <span class="o">=</span> <span class="n">out_iterator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># returns power(2)</span>
+</pre></div>
+</div>
+<p>There are however a number of differences between the two. The imap function
+returns a result object immediately, but this object is only a link (via the
+out_iterator.next method) to the next result to be calculated. The evaluation
+starts as soon as the next method is called (layzy evaluation) and the result is
+returned as soon as it is calculated. The function, argument tuples are still
+evaluated sequentially and on a single processor, but they are returned as soon
+as they are needed and only a single result needs to fit into memory.</p>
+<p>Recent versions of Python (2.6+) provide implementations of a parallel map where
+results are evaluated by a pool of worker processes. This functionality comes in
+three flavours:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">()</span>
+<span class="n">out_list</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">inp_list</span><span class="p">)</span>
+<span class="n">out_iterator1</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">inp_list</span><span class="p">)</span>
+<span class="n">out_iterator1</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">timeout</span> <span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">out_iterator2</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap_unordered</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">inp_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This example like most of the following is a code snippet. It is or should be
+syntactically correct. But might outside of a valid script file.</p>
+</div>
+<p>The Pool.map does exactly the same as the simple map function, but it uses by
+default all availble cores. This addresses the second drawback. Both imap
+methods return a result object with the next method like itertools.imap. Calling
+it returns the next calculated (imap_unordered) or expected result (imap). The
+next method has an optional timeout argument i.e. if no result is availble
+within the limit a TimeoutError is raised. Although it might seem that those
+implementations have none of the above mentioned drawbacks several implementation
+choices make them inappropriate for constructing pipelines.</p>
+</div>
+<div class="section" id="a-pipeline-is-a-nested-imap">
+<h2>A pipeline is a nested imap<a class="headerlink" href="#a-pipeline-is-a-nested-imap" title="Permalink to this headline">¶</a></h2>
+<p>Map functions have a list as input and return a list so they can be nested
+i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">degrees</span><span class="p">,</span> <span class="n">radians</span>
+<span class="nb">map</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="n">radians</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In this example the function radians is first applied to the elements of the
+input list then the the results are back-converted to degrees. The order of
+evaluation:</p>
+<blockquote>
+<div>temp_list = []
+temp_list.append(radians(1))
+temp_list.append(radians(2))
+temp_list.append(radians(3))
+result_list = []
+result_list.append(degrees(temp_list[0]))
+result_list.append(degrees(temp_list[1]))
+result_list.append(degrees(temp_list[2]))
+&lt;&lt; return list of results &gt;&gt;</div></blockquote>
+<p>If we use an iterated (layzy) version of the map function i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">imap</span>
+<span class="n">imap</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">imap</span><span class="p">(</span><span class="n">radians</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The order of calculation changes:</p>
+<blockquote>
+<div>temp_result = radians(1)
+result = degree(temp_result)
+&lt;&lt;return result&gt;&gt;
+temp_result = radians(2)
+result = degree(temp_result)
+&lt;&lt;return result&gt;&gt;
+temp_result = radians(3)
+result = degree(temp_result)
+&lt;&lt;return result&gt;&gt;</div></blockquote>
+<p>Note that only one temporary result needs to be stored at any given time and
+that the first result is returned after only two calculations. But multiprocessing
+Pools imap function yield yet another calculation order.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">()</span>
+<span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">radians</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>What happens is a little bit unexpected, first the function is evaluated (by
+multiple processes) and only after all temporary results are calculated the
+second functions is iteratively applied:</p>
+<div class="highlight-python"><pre>temp_list = []
+temp_list.append(radians(1))
+temp_list.append(radians(2))
+temp_list.append(radians(3))
+result = degree(temp_result[0])
+&lt;&lt;return result&gt;&gt;
+result = degree(temp_result[1])
+&lt;&lt;return result&gt;&gt;
+result = degree(temp_result[2])
+&lt;&lt;return result&gt;&gt;</pre>
+</div>
+<p>The results are either returned imediately or stored in a result list. The
+maximum size of this list is the size of temporary list and the size of the
+input.  The reason for this behaviour is the order by which tasks i.e.
+(function, data) tuples are submitted to the pool. If one pool handles two
+functions first all (radians, x) tuples are submited and then all (degrees, x).
+The outer function is evaluated last so for multiple and computationally
+expensive functions the first result might be availble after a long lag phase
+followed by a burst of results.</p>
+<p>This problem can be solved by having a
+seperate pool for each function.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="n">pool1</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">()</span>
+<span class="n">pool2</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">()</span>
+<span class="n">pool2</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">pool1</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">radians</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now the execution order is not defined anymore as processes in the two Pools
+compete for CPU time from the OS. A possible evaluation order might be like
+this:</p>
+<div class="highlight-python"><pre>temp_list = []
+temp_list.append(radians(1))
+temp_list.append(radians(2))
+result = degree(temp_result[0])
+&lt;&lt;return result&gt;&gt;
+result = degree(temp_result[1])
+&lt;&lt;return result&gt;&gt;
+temp_list.append(radians(3))
+result = degree(temp_result[2])
+&lt;&lt;return result&gt;&gt;</pre>
+</div>
+<p>As you can see a temporary result list is still built. Its maximum lenght is
+not predictable and limited by the lenght of the input. Another drawback is that
+if the number of functions is big the number of process-pool workers
+significantly exceeds the number of availble CPUs or CPU-cores, which is
+inefficient.</p>
+</div>
+<div class="section" id="the-task-and-the-tasklet">
+<h2>The task and the tasklet<a class="headerlink" href="#the-task-and-the-tasklet" title="Permalink to this headline">¶</a></h2>
+<p>The imap implementation in <em>PaPy</em> (<em>IMap</em>) is different as it allows to control the
+order by which function and data tuples are submitted to the worker pool. It
+introduces the concept of a task which is a function, input and arguments tuple.
+The input is a python iterator i.e. an object which has a next method it
+obviously should return data to be calculated next. The argument is a tuple of
+parameters which is given to the function for example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">data_iterator</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;rome&#39;</span><span class="p">,</span> <span class="mf">1.17</span><span class="p">,</span> <span class="n">some_object</span><span class="p">))</span>   <span class="c"># a task</span>
+</pre></div>
+</div>
+<p>The IMap role is to evaluate tasks. To evaluate a task means to evaluate all
+tasklets:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">next</span><span class="p">(),</span> <span class="s">&#39;rome&#39;</span><span class="p">,</span> <span class="mf">1.17</span><span class="p">,</span> <span class="n">someobject</span><span class="p">)</span> <span class="c"># a tasklet</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">data_iterator</span><span class="o">.</span><span class="n">next</span><span class="p">(),</span> <span class="s">&#39;rome&#39;</span><span class="p">,</span> <span class="mf">1.17</span><span class="p">,</span> <span class="n">someobject</span><span class="p">)</span> <span class="c"># evaluation</span>
+</pre></div>
+</div>
+<p>Until the data_iterator is empty.</p>
+</div>
+<div class="section" id="imaps-parallelism-is-defined-by-a-stride">
+<h2>IMaps parallelism is defined by a stride<a class="headerlink" href="#imaps-parallelism-is-defined-by-a-stride" title="Permalink to this headline">¶</a></h2>
+<p>IMap allows to control the order in which tasklets are evaluated. This is
+accomplished by the stride parameter. A stride is the number of tasklets from
+one task submitted before any tasklet from the next task. The default stride is
+equal to the number of pool workers and should not be smaller.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">IMap</span> <span class="kn">import</span> <span class="n">IMap</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">radians</span><span class="p">,</span> <span class="n">degrees</span>
+<span class="n">Imap</span> <span class="o">=</span> <span class="n">IMap</span><span class="p">(</span><span class="n">worker_num</span> <span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">Imap</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">radians</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">Imap</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="n">Imap</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="c"># finished adding tasks</span>
+<span class="n">result</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># or Imap.next(task =1) 0 is the first task</span>
+</pre></div>
+</div>
+<p>In this example the Imap instance has a pool with two workers (by default those
+workers are separate processes), its default stride is therefore 2. The order in
+which the tasks will be evaluated is as follows.:</p>
+<div class="highlight-python"><pre>temp_list = []
+result_list = []
+temp_list.append(radians(1))
+temp_list.append(radians(2))
+result_list.append(degree(temp_list[0]))
+&lt;&lt;return result&gt;&gt;
+result_list.append(degree(temp_list[1]))
+&lt;&lt;return result&gt;&gt;
+temp_list = []
+result_list = []
+temp_list.append(radians(3))
+temp_list.append(radians(4))
+result_list.append(degree(temp_list[2]))
+&lt;&lt;return result&gt;&gt;
+result_list.append(degree(temp_list[3]))
+&lt;&lt;return result&gt;&gt;</pre>
+</div>
+<p>The temp_list (in fact it is a queue) has a defined size limit (stride) and so
+is the result_list. The details of memory consumption will be explained in the
+next paragraphs here it suffices to say that a minimum memory requirement of 2
+temporary results can ben enfored on this pipeline without loss of efficiency.
+If the pipeline was longer and had computationally expensive functions it would
+be noticable that the results from the outer function arrive in burst of 2 or
+bursts of stirde size.</p>
+</div>
+<div class="section" id="imap-needs-tasks-in-the-right-order">
+<h2>IMap needs tasks in the right order<a class="headerlink" href="#imap-needs-tasks-in-the-right-order" title="Permalink to this headline">¶</a></h2>
+<p>In the previous example two nested tasks have been added to the IMap function
+using the add_task method. The general way of working with IMap is as follows:</p>
+<div class="highlight-python"><pre>#0. import IMap
+from IMap import IMap
+#1. define imap keyworded parameters e.g.
+imap_instance = IMap(worker_remote =[['host', 2]])
+#2. add tasks
+out0 = imap_instance.add_task(function0, input_data)
+out1 = imap_instance.add_task(function1, out0)
+out2 = imap_instance.add_task(function2, other_data)
+#3. start the evaluation
+imap_instance.start()
+#4.
+&lt;&lt; get the results &gt;&gt;</pre>
+</div>
+<p>In this section we will focus on step 2. We have submitted 3 tasks to the imap
+instance. Because the order of submission matters they will be evaluated in the
+order.:</p>
+<div class="highlight-python"><pre># first stride
+function0(input_data[0 .. n]) # where n is stride
+function1(out1[0 .. n])
+function2(other_data[0 .. n])
+
+# second stride
+function0(input_data[n .. n+n]) # where n is stride
+function1(out1[n .. n+n])
+function2(other_data[n .. n+n])1
+
+# and so on</pre>
+</div>
+<p>Because function1 depends on the results from function0 it can&#8217;t be added as a
+task before function0. It might seem impossible because function1 takes the
+output of function 0 (out0) as an argument, but in general the input could be an
+object created before out0, which is modified with out0 after creation. This is
+possible because evaluation starts only after the start method is called.</p>
+</div>
+<div class="section" id="imap-can-limit-the-memory-consumption">
+<h2>IMap can limit the memory consumption.<a class="headerlink" href="#imap-can-limit-the-memory-consumption" title="Permalink to this headline">¶</a></h2>
+<p>By default the maximum memory consumption of an IMap instance is equal to the
+number of tasks times the stide size, but this limit can be changed. Consider an
+imap instance with two tasks, which are not nested and a stride of 3, this means
+that the default maximum memory consumption is 6. The evaluation will pause
+whenever the IMap instance reaches the limit. In pseudo-python:</p>
+<blockquote>
+<div>list0 = []
+list1 = []
+# a stride of 3
+list0.append(function0(arg0))
+list0.append(function0(arg1))
+list0.append(function0(arg2)) # list0 has size 3
+list1.append(function1(arg0))
+list1.append(function1(arg1))
+list1.append(function1(arg2)) # list1 has size 3</div></blockquote>
+<p>Because at this moment the two list have together a lenght of 6 no further
+evaluations takes place. The only way to clear a list is to get results from the
+output iterators (say out0 for function0 and out1 for function1). If we take a
+single result say:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">result_0_0</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function0(arg3) to the pool</span>
+</pre></div>
+</div>
+<p>memory consumption lowers to 5 and the next task is submitted to the pool.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">list0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function0</span><span class="p">(</span><span class="n">arg3</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>memory consumption is once again at 6 and the next task (function0, arg4) waits.
+By retrieving results from the output iterators we free the temporary result
+lists (queues) and allow evaluation to proceed. Results do not have to be retrieved
+in the order the tasks have been submitted to the pool or the order in which the
+results have been calculated. Assume that in the last example the next method of
+out0.next() has been called 5 more times:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">result_0_1</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function0(arg4) to the pool</span>
+<span class="n">result_0_2</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function0(arg5) to the pool</span>
+<span class="n">result_0_3</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function1(arg3) to the pool !note 1</span>
+<span class="n">result_0_4</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function1(arg4) to the pool !note 1</span>
+<span class="n">result_0_5</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function1(arg5) to the pool !note 1</span>
+</pre></div>
+</div>
+<p>after all workers finish list0 the imap reaches a stage where:</p>
+<blockquote>
+<div><ul class="simple">
+<li>list0 - will be empty</li>
+<li>list1 - will have 6 results (arg0 - arg5)</li>
+<li>task (function0, arg6) will wait to be submitted</li>
+</ul>
+</div></blockquote>
+<p>List0 is empty and the next task (function0, arg6) cannot be submitted because the
+total memory consumption is 6. If we would call out0.next the result would
+never arrive and the python interpreter would be blocked. A timeout argument can
+be supplied it causes the next method to raise a TimeoutError if after the
+specified number of seconds no result is availble.:</p>
+<div class="highlight-python"><pre>result_0_6 = out0.next(timeout =2) # raise after 2 seconds
+Traceback (most recent call last):
+File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+multiprocessing.TimeoutError</pre>
+</div>
+<p>We have to empty the other functions output (out1) to get the 7th result for
+out0. Note that the order of task submissions is defined at start by how the memory
+is freed (the order in which out0.next nad out1.next are called) does not change this
+order:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">result_1_0</span> <span class="o">=</span> <span class="n">out1</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function0(arg6) to the pool</span>
+<span class="n">result_0_6</span> <span class="o">=</span> <span class="n">out0</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># submits function0(arg7) to the pool</span>
+</pre></div>
+</div>
+<p>To never run into an block only it is necessary to:</p>
+<blockquote>
+<div><ul class="simple">
+<li>retrieve at most stride number of results from any output in a sequence</li>
+<li>retrieve the result n from outputN before the result n from outputN+1</li>
+</ul>
+</div></blockquote>
+<p>The most memory efficient way to do this is to get the results in batches of
+stride size, which is equivalent to the order the tasks have been submitted to
+the worker pool. If the two functions from the above example were nested this
+would happen automatically for the inner function. If the the pipeline run in
+the most memory efficient way the memory consumption can be lowered to the
+stride of the IMap this is done using the buffer argument. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Imap</span> <span class="o">=</span> <span class="n">IMap</span><span class="p">(</span><span class="n">stride</span> <span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="nb">buffer</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="parallel-local-vs-remote-and-threads-vs-processes">
+<h2>Parallel: local vs. remote and threads vs. processes<a class="headerlink" href="#parallel-local-vs-remote-and-threads-vs-processes" title="Permalink to this headline">¶</a></h2>
+<p>IMap supports parallelization using local threads (worker_type =&#8217;thread&#8217;) and
+processes (worker_type=&#8217;process&#8217;). Remote threads and processes are run by local
+processes. IMap is designed to allow the user to choose the type of parallelization
+using the worker_type argument and/or by specifying the remote processes using the
+worker_remote argument.</p>
+<p>Because of the global interpreter lock (GIL) in the standard cPython
+implementation of the Python programming language, only one os-thread can
+execute interpreted python code. Multiple running threads are assigned
+timeslices of &#8220;code access&#8221;. In general it is not possible to speed cpu-bound
+computations using threads. Multiple threads can however speed up certain
+functions to a certain degree if either the function is:</p>
+<blockquote>
+<div><ul class="simple">
+<li>IO-bound (e.g. waits for server responses)</li>
+<li>uses libraries which release the global interpreter lock</li>
+</ul>
+</div></blockquote>
+<p>The first case applies to all function which depend on user interaction and
+other blocking Input/Output operations like reading or writing a file. the
+second case applies mostly to external compiled libraries doing cpu-intensive
+calculations. Those libraries can nativly be multithreaded. An IMap running
+tasks in worker threads is therfore a good choice if the tasks submitted to
+the function are IO-bound or if it uses a library which releases the GIL for
+significant periods of time.</p>
+<p>The GIL can be circumvented by forking the python interpreter process instead of
+spawning additional threads within. Such forked processes have seperate memory
+space and are seen by the operating system as another python interpreter.
+Multiple processes have each their own GIL and are therefore suited to
+parallelize intepreted python code. This parallelization will make the
+computation faster if the operating system has enough resources to support the
+processes. If a function is CPU-bound the most limiting resource is the CPU and
+therefore the number of processes should not exceed the number of availble
+CPUs. Using multiple processes within on parent process is called
+multiprocessing and python 2.6 and above support this feature via the
+multiprocessing module out of the box on most operating systems (Linux, MacOSX,
+Windows). There are however implementation differences among UNIX systems and
+Windows which make multiprocessing on Windows less efficient. This module is
+also back-ported to python 2.5 as external module. It is also possible to
+parallelize local computations using the RPyC library. For cpu-bound tasks the
+additional overhead is minor.</p>
+<p>If a single machine is not fast enough for the task, distributed computing i.e.
+computation on remote physical computers might be considered. IMap supports
+distributed computation using the RPyC library. To use this feature a &#8220;classic&#8221;
+RPyC server has to be running on a remote host. This server allows clients (i.e.
+IMap instances) to connect to them and execute functions. An RPyC server can be
+both thread or process based. Only a process-based RPyC will be able to use
+multiple CPUs on the remote computer (not supported on Windows). An IMap which
+connects to remote servers spawns a new process for each thread/process
+spawned/forked remotely (by the RPyC server).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">IMap has no possiblity to change the thread/process nature of the remote
+server.</p>
+</div>
+<p>In the following example snippet:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Imap</span> <span class="o">=</span> <span class="n">IMap</span><span class="p">(</span><span class="n">worker_type</span> <span class="o">=</span><span class="s">&#39;process&#39;</span><span class="p">,</span> <span class="n">worker_num</span> <span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">worker_remote</span> <span class="o">=</span><span class="p">[[</span><span class="s">&#39;host1&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;host2&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>An IMap instance is created which uses worker processes. It has a total of 7
+local worker processes. Five of the local worker processes do the computation
+on remote hosts: 4 on host2 nad 1 on host1.</p>
+<p>The following is illegal, because remote threads/processes can be managed only
+by &#8216;process&#8217; workers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Imap</span> <span class="o">=</span> <span class="n">IMap</span><span class="p">(</span><span class="n">worker_type</span> <span class="o">=</span><span class="s">&#39;process&#39;</span><span class="p">,</span> <span class="n">worker_num</span> <span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">worker_remote</span> <span class="o">=</span><span class="p">[[</span><span class="s">&#39;host1&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;host2&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>The RPyC server can also be started on the local machine (&#8216;localhost&#8217;). In this
+example the IMap instance has a total of 2 local worker processes which manage
+two remote processes which happen to exist on the same physical machine.:</p>
+<div class="highlight-python"><pre>Imap = IMap(worker_type ='process', worker_num =0, worker_remote =[[localhost', 2]])</pre>
+</div>
+</div>
+<div class="section" id="if-the-order-of-the-results-is-not-important">
+<h2>If the order of the results is not important<a class="headerlink" href="#if-the-order-of-the-results-is-not-important" title="Permalink to this headline">¶</a></h2>
+<p>IMap supports unordered results via the unordered argument:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Imap</span> <span class="o">=</span> <span class="n">IMap</span><span class="p">(</span><span class="n">ordered</span> <span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c"># the default is ordered</span>
+<span class="n">Imap</span> <span class="o">=</span> <span class="n">IMap</span><span class="p">(</span><span class="n">ordered</span> <span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># random order of results</span>
+</pre></div>
+</div>
+<p>If the results are allowed to be unordered the evaluation might be significantly
+faster under certain circumstances described later, but this order is not
+reproducible. As a general advice do not use unordered Imap instances in
+branched papy pipelines, unless you really know what you are doing.</p>
+</div>
+<div class="section" id="timeouts-and-skipping">
+<h2>Timeouts and skipping<a class="headerlink" href="#timeouts-and-skipping" title="Permalink to this headline">¶</a></h2>
+<p>IMap supports timeouts. A TimeoutError (from the multiprocessing module) is
+raised whenever a result for a given task cannot be returned within
+approximately the number of seconds specified. The timeout is only approximate
+because IMap uses multiple threads to manage the input and output queues for the
+worker threads/process. The thread, which receives result might not not have
+access to the interpreter when the timeout passes.</p>
+<p>The skipping argument allows to skip results which did timeout. If skipping is
+not specified IMap will try to return the same result (for this task) once more.
+If the timeout is not specified skipping is ignored. If IMap is used with nested
+tasks a timeout should in practice not be specified unless IMap is used within
+from a piper object or the IMap instance</p>
+<p>and timeouts are specified the skipping argument should be true, the
+reason for this is that</p>
+</div>
+<div class="section" id="the-parallel-stride-revisited">
+<h2>The parallel stride revisited<a class="headerlink" href="#the-parallel-stride-revisited" title="Permalink to this headline">¶</a></h2>
+<p>In one of the previous sections it has been described how IMap allows for
+parallelism by introducing the concept of the stride. To recapitulate a stride
+is the number of tasklets submitted to the pool for a specific task to be
+executed/evaluated in parallel. Another tasklet can be submitted if the buffer
+is larger than the stride or as soon as any of the results of the parallel
+evaluations is retrieved. The user can add multiple tasks to one IMap instance.
+If the evaluation is CPU-bound and the IMap uses worker processes an optimal
+speed up equal to the number of CPUs or CPU-cores. However because of inter task
+dependencies i.e. nested functions, the speed-up might be smaller as a result of
+the memory trade-off and task submission order.</p>
+<blockquote>
+<div><p>#. <em>The output needs to be retrieved</em>. If the output of an IMap instance is not
+retrieved it will pause whenever it fill the buffer of temporary results,
+therefore it is important to retrieve the results as soon as they are ready.
+Because results generaly arrive in batches of stride size it is best to try to
+retrieve stride number of results from each task. If the IMap is used within a
+papy pipeline the Plumber has a seperate thread (started using the plunge
+method) dedicated to keep the IMap evaluating.</p>
+<ol class="arabic simple">
+<li><em>Variable tasklet calculation times</em></li>
+</ol>
+</div></blockquote>
+<p>If the next task depends on the results from the
+first task then it&#8217;s first tasklet</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">About the Parallelism in <em>PaPy</em></a><ul>
+<li><a class="reference internal" href="#map-basics">Map basics</a></li>
+<li><a class="reference internal" href="#a-pipeline-is-a-nested-imap">A pipeline is a nested imap</a></li>
+<li><a class="reference internal" href="#the-task-and-the-tasklet">The task and the tasklet</a></li>
+<li><a class="reference internal" href="#imaps-parallelism-is-defined-by-a-stride">IMaps parallelism is defined by a stride</a></li>
+<li><a class="reference internal" href="#imap-needs-tasks-in-the-right-order">IMap needs tasks in the right order</a></li>
+<li><a class="reference internal" href="#imap-can-limit-the-memory-consumption">IMap can limit the memory consumption.</a></li>
+<li><a class="reference internal" href="#parallel-local-vs-remote-and-threads-vs-processes">Parallel: local vs. remote and threads vs. processes</a></li>
+<li><a class="reference internal" href="#if-the-order-of-the-results-is-not-important">If the order of the results is not important</a></li>
+<li><a class="reference internal" href="#timeouts-and-skipping">Timeouts and skipping</a></li>
+<li><a class="reference internal" href="#the-parallel-stride-revisited">The parallel stride revisited</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="architecture.html"
+                        title="previous chapter">Architecture</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ipc.html"
+                        title="next chapter">Inter Process Communication</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/parallelism.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ipc.html" title="Inter Process Communication"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="PaPy - Parallel Pipelines in Python" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PaPy - Parallel Pipelines in Python"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Many computational tasks require sequential processing of data i.e. the global
+data set is split into items which are processed separately by multiple chained
+processing nodes. This is generally called a dataflow. <strong>PaPy</strong> adapts
+flow-based programming paradigms and allows to create a data-processing pipeline
+which allows for both data and task parallelism. In the process of design we
+tried to make the <strong>PaPy</strong> API as idiosyncrasy-free as possible, relying on
+familiar concepts of map functions and directed acyclic graphs.</p>
+<div class="section" id="feature-summary">
+<h2>Feature summary<a class="headerlink" href="#feature-summary" title="Permalink to this headline">¶</a></h2>
+<p>This is a list of features of a workflow constructed using the <strong>PaPy</strong> package
+and its additional components.</p>
+<blockquote>
+<div><ul class="simple">
+<li>construction of arbitrarily complex pipelines (any directed acyclic graph is
+a valid workflow)</li>
+<li>evaluation is lazy-buffered (allows to process datasets that do not fit into
+memory)</li>
+<li>flexible local and remote parallelism (local and remote resources can be
+pooled)</li>
+<li>shared local and remote resources (resource pools can be flexibly assigned
+to processing nodes)</li>
+<li>robustness to exceptions</li>
+<li>support for time-outs</li>
+<li>real-time logging / monitoring</li>
+<li>os-independent (really a feature of <tt class="docutils literal"><span class="pre">multiprocessing</span></tt>)</li>
+<li>distributed (really a feature of <em>RPyC</em>)</li>
+<li>small code-base</li>
+<li>tested &amp; documented.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>Workflows are constructed from components of orthogonal functionality:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the function wrapping <tt class="docutils literal"><span class="pre">Workers</span></tt></li>
+<li>the connection capable <tt class="docutils literal"><span class="pre">Pipers</span></tt></li>
+<li>the topology defining <tt class="docutils literal"><span class="pre">Dagger</span></tt></li>
+<li>the parallel executors <tt class="docutils literal"><span class="pre">NuMaps</span></tt></li>
+</ul>
+</div></blockquote>
+<p>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> connects <tt class="docutils literal"><span class="pre">Pipers</span></tt> via pipes into a directed acyclic graph while
+the <tt class="docutils literal"><span class="pre">NuMaps</span></tt> are assigned to <tt class="docutils literal"><span class="pre">Pipers</span></tt> and evaluate their <tt class="docutils literal"><span class="pre">Workers</span></tt> either
+locally using threads or processes or on remote hosts. The <tt class="docutils literal"><span class="pre">Workers</span></tt> allow to
+compose multiple functions while the <tt class="docutils literal"><span class="pre">Pipers</span></tt> allow to connect the inputs and
+outputs of <tt class="docutils literal"><span class="pre">Workers</span></tt> as defined by the <tt class="docutils literal"><span class="pre">Dagger</span></tt> topology. Data parallelism
+is possible because data items are independent i.e. if it is a collection (or
+can be  split into one) of data-items: files, messages, sequences, arrays.
+<strong>PaPy</strong> enables task  parallelism by allowing the data processing functions to
+be evaluated on  different computational resources represented by <tt class="docutils literal"><span class="pre">NuMap</span></tt>
+instances.</p>
+<p><strong>PaPy</strong> is written in and for Python this means that the user is expected to
+write Python functions with defined call/return signatures, but the function
+code is largely arbitrary e.g. they can call a perl script or import a library.
+<strong>PaPy</strong> focuses on modularity, functions should be re-used and composed within
+pipelines and <tt class="docutils literal"><span class="pre">Workers</span></tt>.</p>
+<p>The <strong>PaPy</strong> workflow automatically logs it&#8217;s execution is resistant to
+exceptions and timeouts and should work on all platforms where
+<tt class="docutils literal"><span class="pre">multiprocessing</span></tt> is available. It also allows to compute over a
+cross-platform ad-hoc grid using the <strong>RPyC</strong> package.</p>
+</div>
+<div class="section" id="where-when-should-papy-be-used">
+<h2>Where/When should <strong>PaPy</strong> be used?<a class="headerlink" href="#where-when-should-papy-be-used" title="Permalink to this headline">¶</a></h2>
+<p>It is likely that you will benefit from using <strong>PaPy</strong> if some of the following
+is true:</p>
+<blockquote>
+<div><ul class="simple">
+<li>you need to process large collections of data items.</li>
+<li>your data collection is to large to fit into memory.</li>
+<li>you want to utilize an ad-hoc grid.</li>
+<li>you have to construct a complex workflow or data-flows.</li>
+<li>you are likely to deal with timeouts or bogus data.</li>
+<li>the execution of your workflow needs to be logged / monitored.</li>
+<li>you want to refactor existing code.</li>
+<li>you want to reuse (wrap) existing code.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="where-when-should-papy-not-be-used">
+<h2>Where/When should <strong>PaPy</strong> <strong>not</strong> be used?<a class="headerlink" href="#where-when-should-papy-not-be-used" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>You do not need a workflow just a method to evaluate a function in parallel
+(consider <tt class="docutils literal"><span class="pre">NuMap</span></tt> for this).</li>
+<li>The parallel evaluation will improve performance only if the functions have
+sufficient granularity i.e. a computation to communication ratio.</li>
+<li>Your input is not a collection and it does not allow for data parallelism.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#feature-summary">Feature summary</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#where-when-should-papy-be-used">Where/When should <strong>PaPy</strong> be used?</a></li>
+<li><a class="reference internal" href="#where-when-should-papy-not-be-used">Where/When should <strong>PaPy</strong> <strong>not</strong> be used?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter"><strong>PaPy</strong> - Parallel Pipelines in Python</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/bullets.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PaPy - Parallel Pipelines in Python"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dictionary of terms and definitions &mdash; PaPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="next" title="PaPy API" href="api.html" />
+    <link rel="prev" title="FAQ" href="faq.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="PaPy API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="FAQ"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dictionary-of-terms-and-definitions">
+<h1>Dictionary of terms and definitions<a class="headerlink" href="#dictionary-of-terms-and-definitions" title="Permalink to this headline">¶</a></h1>
+<p>A dictionary of terms used within the documentation.</p>
+<div class="section" id="map">
+<h2>map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h2>
+<p>Higher-order map function. A function which evaluates another function on all
+elements of the input collection.</p>
+</div>
+<div class="section" id="imap">
+<h2>imap<a class="headerlink" href="#imap" title="Permalink to this headline">¶</a></h2>
+<p>Iterated higher-order map function. A function which evaluates another function
+on all elements of the input collection returning and evaluating the restuls
+iteratively and lazily. <strong>PaPy</strong> depends on the <tt class="docutils literal"><span class="pre">imap</span></tt> implementation provided
+by  the standard Python imap from <tt class="docutils literal"><span class="pre">itertools.imap</span></tt> and the advanced <tt class="docutils literal"><span class="pre">NuMap</span></tt>.</p>
+</div>
+<div class="section" id="numap">
+<h2>NuMap<a class="headerlink" href="#numap" title="Permalink to this headline">¶</a></h2>
+<p>A parallel implementation of a multi-task imap function, which is used within
+<strong>PaPy</strong>. It uses a pool of worker-threads or worker-processes and evaluates
+functions in parallel either locally or remotely.</p>
+</div>
+<div class="section" id="worker-function">
+<h2>Worker function<a class="headerlink" href="#worker-function" title="Permalink to this headline">¶</a></h2>
+<p>A function with a standarized input written to be used by a <tt class="docutils literal"><span class="pre">Worker</span></tt> class
+instance. All processing of a <strong>PaPy</strong> pipeline has to be coded as <tt class="docutils literal"><span class="pre">Worker</span></tt>
+functions.</p>
+</div>
+<div class="section" id="worker-process-thread">
+<h2>worker process / thread<a class="headerlink" href="#worker-process-thread" title="Permalink to this headline">¶</a></h2>
+<p>A thread or process inside an <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance evaluating a tasklet remotely
+or locally.</p>
+</div>
+<div class="section" id="worker">
+<h2>Worker<a class="headerlink" href="#worker" title="Permalink to this headline">¶</a></h2>
+<p>An object-oriented wrapper for worker functions, it is rougly equivalent to a
+&#8220;function with partially applied arguments&#8221;.</p>
+</div>
+<div class="section" id="piper">
+<h2>Piper<a class="headerlink" href="#piper" title="Permalink to this headline">¶</a></h2>
+<p>An object oriented wrapper for <tt class="docutils literal"><span class="pre">Worker</span></tt> instances, corresponds to &#8220;worker with
+defined mode of evaluation&#8221;.</p>
+</div>
+<div class="section" id="dagger">
+<h2>Dagger<a class="headerlink" href="#dagger" title="Permalink to this headline">¶</a></h2>
+<p>An directed acyclic graph (DAG) to store and connect <tt class="docutils literal"><span class="pre">Piper</span></tt> instances.</p>
+</div>
+<div class="section" id="plumber">
+<h2>Plumber<a class="headerlink" href="#plumber" title="Permalink to this headline">¶</a></h2>
+<p>A wrapper for the <tt class="docutils literal"><span class="pre">Dagger</span></tt> designed to run and interact with a running
+pipeline.</p>
+</div>
+<div class="section" id="input-stream">
+<h2>input stream<a class="headerlink" href="#input-stream" title="Permalink to this headline">¶</a></h2>
+<p>The input stream is the data that enters a <strong>PaPy</strong> pipeline. The data is
+assumed to be a collection of items expressed as a Python iterator (or any
+object which has the next method).</p>
+<p>Any sequence (e.g. a <tt class="docutils literal"><span class="pre">list</span></tt> or a <tt class="docutils literal"><span class="pre">tuple</span></tt>) can be made into an iterator using
+the Python built-in <tt class="docutils literal"><span class="pre">iter</span></tt> function e.g:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sample_sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_point1</span><span class="p">,</span> <span class="n">data_point2</span><span class="p">,</span> <span class="n">data_point3</span><span class="p">]</span>
+<span class="n">sample_iterator</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">sample_sequence</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Files are by default line-iterators i.e.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sample_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;sample_file.txt&#39;</span><span class="p">)</span>
+<span class="n">sample_file</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># returns the first line</span>
+<span class="n">sample_file</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c"># returns the second line</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-stream">
+<h2>output stream<a class="headerlink" href="#output-stream" title="Permalink to this headline">¶</a></h2>
+<p>Input item saved (to disk) by an output <tt class="docutils literal"><span class="pre">Piper</span></tt>. By default the output
+<tt class="docutils literal"><span class="pre">Piper</span></tt> should return a <tt class="docutils literal"><span class="pre">None</span></tt> for every input item, but save the result
+persistently (somehow/somewhere).</p>
+</div>
+<div class="section" id="item">
+<h2>item<a class="headerlink" href="#item" title="Permalink to this headline">¶</a></h2>
+<p>A single element of the data stream.</p>
+</div>
+<div class="section" id="input-piper">
+<h2>input Piper<a class="headerlink" href="#input-piper" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt>, which is connected to a input stream (or multiple input streams) is
+a input <tt class="docutils literal"><span class="pre">Piper</span></tt>. Such a <tt class="docutils literal"><span class="pre">Piper</span></tt> corresponds to a node in the graph which has
+no  upstream nodes within the <strong>PaPy</strong> workflow or in other words has no
+outgoing edges in the directed acyclic graph. An input <tt class="docutils literal"><span class="pre">Piper</span></tt> is an input
+node in the graph representing the workflow.</p>
+</div>
+<div class="section" id="output-piper">
+<h2>output Piper<a class="headerlink" href="#output-piper" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="docutils literal"><span class="pre">Piper</span></tt>, which generates the output stream is an output <tt class="docutils literal"><span class="pre">Piper</span></tt>. A
+<strong>PaPy</strong> workflow might have multiple output <em>Pipers</em> in different places of the
+pipeline. An output <tt class="docutils literal"><span class="pre">Piper</span></tt> corresponds to a node in the graph which has no
+downstream nodes within the pipeline or in other words has no incoming edges in
+the directed acyclic graph. An output <tt class="docutils literal"><span class="pre">Piper</span></tt> is an output node in the
+graph representing the pipeline.</p>
+</div>
+<div class="section" id="lazy-evaluation">
+<h2>lazy evaluation<a class="headerlink" href="#lazy-evaluation" title="Permalink to this headline">¶</a></h2>
+<p>Is the technique of delaying a computation until the result is required.</p>
+</div>
+<div class="section" id="task">
+<h2>task<a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
+<p>A task is an ordered <tt class="docutils literal"><span class="pre">tuple</span></tt> of objects added to the <tt class="docutils literal"><span class="pre">NuMap</span></tt> instance it
+consists of:</p>
+<blockquote>
+<div><ul class="simple">
+<li>a function, which will be evaulated on the input element-wise</li>
+<li>an input (a <tt class="docutils literal"><span class="pre">list</span></tt>, <tt class="docutils literal"><span class="pre">tuple</span></tt> or any iterator object like an <tt class="docutils literal"><span class="pre">array</span></tt>)</li>
+<li>a <tt class="docutils literal"><span class="pre">tuple</span></tt> of arguments e.g. <tt class="docutils literal"><span class="pre">(arg1,</span> <span class="pre">arg2,</span> <span class="pre">arg3)</span></tt></li>
+<li>a <tt class="docutils literal"><span class="pre">dict</span></tt> of keyword arguments i.e. <tt class="docutils literal"><span class="pre">{'arg1':</span> <span class="pre">value_1,</span> <span class="pre">'arg2':</span> <span class="pre">value_2}</span></tt></li>
+</ul>
+</div></blockquote>
+<p>The optional arguments and keyworded arguments have to match the signature of
+the function. The task is iteratively split into evaluated calls in the
+following way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">element_from_iterable</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">keyworded_arguments</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">element_from_iterable</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">keyworded_arguments</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inbox">
+<h2>inbox<a class="headerlink" href="#inbox" title="Permalink to this headline">¶</a></h2>
+<p>The first argument of any <tt class="docutils literal"><span class="pre">Worker</span></tt> function. The elements of the function
+correspond to the outputs of the upstream function in the <tt class="docutils literal"><span class="pre">Worker</span></tt> instance or
+to outputs of other <tt class="docutils literal"><span class="pre">Pipers</span></tt>. These outputs are defined by the pipeline
+topology. The contents of the inbox depend on a specific input item to the
+pipeline. All other arguments of a worker function are predetermined.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dictionary of terms and definitions</a><ul>
+<li><a class="reference internal" href="#map">map</a></li>
+<li><a class="reference internal" href="#imap">imap</a></li>
+<li><a class="reference internal" href="#numap">NuMap</a></li>
+<li><a class="reference internal" href="#worker-function">Worker function</a></li>
+<li><a class="reference internal" href="#worker-process-thread">worker process / thread</a></li>
+<li><a class="reference internal" href="#worker">Worker</a></li>
+<li><a class="reference internal" href="#piper">Piper</a></li>
+<li><a class="reference internal" href="#dagger">Dagger</a></li>
+<li><a class="reference internal" href="#plumber">Plumber</a></li>
+<li><a class="reference internal" href="#input-stream">input stream</a></li>
+<li><a class="reference internal" href="#output-stream">output stream</a></li>
+<li><a class="reference internal" href="#item">item</a></li>
+<li><a class="reference internal" href="#input-piper">input Piper</a></li>
+<li><a class="reference internal" href="#output-piper">output Piper</a></li>
+<li><a class="reference internal" href="#lazy-evaluation">lazy evaluation</a></li>
+<li><a class="reference internal" href="#task">task</a></li>
+<li><a class="reference internal" href="#inbox">inbox</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="faq.html"
+                        title="previous chapter">FAQ</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="next chapter"><strong>PaPy</strong> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/terms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="PaPy API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="FAQ"
+             >previous</a> |</li>
+        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Marcin Cieslik.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
