@@ -16,7 +16,11 @@ from tempfile import NamedTemporaryFile
 CMD = \
 """
 %s
-(eval $1) && echo 0 >> $2 || echo 1 >> $2 &
+run() {
+  (eval %s) && echo 0 >> "%s" || echo 1 >> "%s"
+}
+run 
+exit 0
 """
 
 PY_TEMPLATE = """import sys, json
@@ -51,15 +55,15 @@ exit 0
 def _eval_cmd(evaluator, preamble, dir, cmd):
     with NamedTemporaryFile(dir=dir) as wrapper, \
          NamedTemporaryFile(dir=dir) as status:
-        wrapper.file.write(CMD % preamble)
+        wrapper.file.write(CMD % (preamble, cmd, status.name, status.name))
         wrapper.file.flush()
-        proc = Popen([evaluator, wrapper.name, cmd, status.name], stdin=None, stdout=PIPE, 
+        proc = Popen([evaluator, wrapper.name], stdin=None, stdout=PIPE, 
                      stderr=PIPE)
+        stdout, stderr = proc.communicate(None)
         err = status.file.read()
         while len(err) == 0:
             err = status.file.read()
             sleep(0.1)
-        stdout, stderr = proc.communicate(None)
     code = int(err)
     return (code, stdout, stderr)
 
@@ -141,8 +145,8 @@ def script(inbox, cfg):
     args = {}
     args["params"] = dict(cfg["params"])
     # connect child in_ports to parent out_ports
+    args["in"] = {}
     for in_port, in_port_type in cfg["in"]:
-        args["in"] = {}
         for out_ports in inbox:
             in_val, in_type, in_keep = out_ports.get(in_port, (None, None, None))
             if (in_val is not None) and (in_port_type == in_type):
@@ -151,12 +155,14 @@ def script(inbox, cfg):
                 break
     # check that all input ports are connected
     if len(args["in"]) < len(cfg["in"]):
-        raise Exception("not all in_ports connected")
+        raise Exception("not all in_ports connected, got: %s" (args["in"],))
     # create output file for out_ports
     args["out"] = {}
     out = {}
     for out_port, out_type, out_keep in cfg["out"]:
-        out_val = NamedTemporaryFile(dir=cfg["dir"], delete=False).name
+        pfx = args["in"][cfg["in"][0][0]].split("/")[-1].split(".")[0] + "_"
+        sfx = "." + out_port
+        out_val = NamedTemporaryFile(dir=cfg["dir"], prefix=pfx, suffix=sfx, delete=False).name
         args["out"][out_port] = out_val
         out[out_port] = (out_val, out_type, out_keep)
     # evaluate and check for errors
