@@ -3,37 +3,40 @@
 from numap import NuMap
 from papy.core import Dagger, Piper, Worker
 from papy.util.script import script
+from papy.util.func import npasser
 
 import os
 
 sh_cfg = {
+    "id":"sh",
     "evaluator":"bash",
     "preamble":"",
     "dir":os.getcwd(),
     "executable":"bash",
     "script":"bash_script.sh",
-    "in":(
-        ("message", "file"),
-    ),
+    "in":("message",),
     "out":(
-         ("greeting", "file", False), # type = file, keep = false
+        ("greeting", "txt"),
     ),
-    "params":{}
+    "params":{
+    }
 }
 
 py_cfg = {
+    "id":"py",
     "evaluator":"bash",
     "preamble":"",
     "dir":os.getcwd(),
     "executable":"python",
     "script":"python_script.py",
     "in":(
-        ("greeting", "file"), # input type file
+        "greeting",
     ),
     "out":(
-        ("package", "file", True),
+        ("package", "txt"),
     ),
-    "params":{}
+    "params":{
+    }
 }
 
 sh_worker = Worker(script, (sh_cfg,))
@@ -48,17 +51,15 @@ py_piper = Piper(py_worker, parallel=numap)
 
 # topology
 pipeline = Dagger()
-pipeline.add_pipe((sh_piper, py_piper))
+pipeline.add_pipe((sh_piper, py_worker))
 end = pipeline.get_outputs()[0]
 
 # runtime
 pipeline.connect(
     [[
-        {"message":("work moar", "file", True)}, 
-        {"message":("nevar give up", "file", True)}
+        {"message":"work_moar.txt"}, 
+        {"message":"nevar_give_up.txt"}
     ]])
 
 pipeline.start()
 print list(end)
-
-

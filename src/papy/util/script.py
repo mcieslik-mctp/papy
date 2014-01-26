@@ -108,11 +108,12 @@ def get_config(lang="python"):
             "dir":"{{os.getcwd()}}",
             "executable":"bash",
             "script":"{{script_name.sh}}",
+            "1to1":False,
             "in":(
-                ("{{port_name}}", "file"),
+                "{{port_name}}",
             ),
             "out":(
-                ("{{port_name}}", "file", "{{True if keep}}"), 
+                ("{{port_name}}", "{{file_extension}}"), 
             ),
             "params":{}
         },
@@ -120,13 +121,14 @@ def get_config(lang="python"):
             "evaluator":"bash",
             "preamble":"",
             "dir":"{{os.getcwd()}}",
-            "executable":"python",
+            "executable":"python2",
             "script":"{{script_name.py}}",
+            "multi":False,
             "in":(
-                ("{{port_name}}", "file"), # input type file
+                "{{port_name}}", 
             ),
             "out":(
-                ("{{port_name}}", "file", "{{True if keep}}"),
+                ("{{port_name}}", "{{file_extension}}"),
             ),
             "params":{}
         }}
@@ -141,17 +143,15 @@ def script(inbox, cfg):
       - cfg(``dict``) script configuartion dictionary
 
     """
-    # copy params to args
     args = {}
     args["params"] = dict(cfg["params"])
-    # connect child in_ports to parent out_ports
     args["in"] = {}
-    for in_port, in_port_type in cfg["in"]:
-        for out_ports in inbox:
-            in_val, in_type, in_keep = out_ports.get(in_port, (None, None, None))
-            if (in_val is not None) and (in_port_type == in_type):
+    for in_port in cfg["in"]:
+        for inin_ports in inbox:
+            in_path = inin_ports.get(in_port, None)
+            if (in_path is not None):
                 # first matching input-output (including type) port is linked remaining ignored
-                args["in"][in_port] = in_val
+                args["in"][in_port] = in_path
                 break
     # check that all input ports are connected
     if len(args["in"]) < len(cfg["in"]):
@@ -159,23 +159,19 @@ def script(inbox, cfg):
     # create output file for out_ports
     args["out"] = {}
     out = {}
-    for out_port, out_type, out_keep in cfg["out"]:
-        pfx = args["in"][cfg["in"][0][0]].split("/")[-1].split(".")[0] + "_"
-        sfx = "." + out_port
-        out_val = NamedTemporaryFile(dir=cfg["dir"], prefix=pfx, suffix=sfx, delete=False).name
-        args["out"][out_port] = out_val
-        out[out_port] = (out_val, out_type, out_keep)
+    for i, (out_port, out_ext) in enumerate(cfg["out"]):
+        if cfg["in"] == tuple(out_port_ for out_port_, _ in cfg["out"]):
+            pfx = args["in"][cfg["in"][i]].split("/")[-1].split(".")[0] + "_"
+            base = cfg["id"]
+        else:
+            pfx = args["in"][cfg["in"][0]].split("/")[-1].split(".")[0] + "_"
+            base = cfg["id"] + "#" + out_port 
+        out_path = cfg["dir"] + "/" + pfx + base + "." + out_ext
+        args["out"][out_port] = out_path
+        out[out_port] = out_path
     # evaluate and check for errors
     ret = _eval_script(cfg["evaluator"], cfg["preamble"], cfg["dir"], cfg["executable"], cfg["script"], args)
     if ret[0] != 0:
         raise Exception(ret[0], cfg["script"], ret[1], ret[2])
-    # remove files attached to input ports
-    for in_port, in_port_type in cfg["in"]:
-        if in_port_type == "file":
-            for out_ports in inbox:
-                in_val, in_type, in_keep = out_ports.get(in_port, (None, None, None))
-                if (in_val is not None) and (in_port_type == in_type) and not in_keep:
-                    os.unlink(in_val)
-                    # only first matching was connected so only first matching is removed
-                    break
     return out
+

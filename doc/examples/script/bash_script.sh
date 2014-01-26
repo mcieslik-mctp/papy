@@ -17,9 +17,7 @@ print "; ".join((F_PARAMS, F_IN, F_OUT))
 EOF
 )
 
-echo ${IN["message"]} > ${OUT["greeting"]}
-exit 0
-
+cp "${IN['message']}" "${OUT['greeting']}"
 
 
 
