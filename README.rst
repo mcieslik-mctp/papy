@@ -17,4 +17,4 @@ a memory "buffer".
 
 Documentation can be found `here <http://mcieslik-mctp.github.io/papy/>`_
 
-The package is tested on Python 2.7.5
+The package is tested on Python 2.7.6
