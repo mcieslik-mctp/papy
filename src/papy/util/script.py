@@ -10,6 +10,7 @@ scripts.
 import os
 import json
 from time import sleep
+from glob import glob
 from subprocess import Popen, PIPE, CalledProcessError
 from tempfile import NamedTemporaryFile
 
@@ -57,8 +58,11 @@ def _eval_cmd(evaluator, preamble, dir, cmd):
          NamedTemporaryFile(dir=dir) as status:
         wrapper.file.write(CMD % (preamble, cmd, status.name, status.name))
         wrapper.file.flush()
-        proc = Popen([evaluator, wrapper.name], stdin=None, stdout=PIPE, 
-                     stderr=PIPE)
+        try:
+            proc = Popen([evaluator, wrapper.name], stdin=None, stdout=PIPE, 
+                         stderr=PIPE)
+        except OSError:
+            return (1, "", "subprocess call failed: %s" % evaluator)
         stdout, stderr = proc.communicate(None)
         err = status.file.read()
         while len(err) == 0:
@@ -68,6 +72,10 @@ def _eval_cmd(evaluator, preamble, dir, cmd):
     return (code, stdout, stderr)
 
 def _eval_script(evaluator, preamble, dir, executable, script, args):
+    if glob(dir + "/*"):
+        raise Exception("directory: %s not empty" % dir) 
+    if not os.path.exists(dir):
+        os.mkdir(dir)
     with NamedTemporaryFile(dir=dir) as args_:
         args_.file.write(json.dumps(args))
         args_.file.flush()
@@ -166,7 +174,10 @@ def script(inbox, cfg):
         else:
             pfx = args["in"][cfg["in"][0]].split("/")[-1].split(".")[0] + "_"
             base = cfg["id"] + "#" + out_port 
-        out_path = cfg["dir"] + "/" + pfx + base + "." + out_ext
+        if out_ext:
+            out_path = cfg["dir"] + "/" + pfx + base + "." + out_ext
+        else:
+            out_path = cfg["dir"] + "/" + pfx + base
         args["out"][out_port] = out_path
         out[out_port] = out_path
     # evaluate and check for errors
