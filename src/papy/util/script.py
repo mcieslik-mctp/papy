@@ -72,17 +72,20 @@ def _eval_cmd(evaluator, preamble, dir, cmd):
     return (code, stdout, stderr)
 
 def _eval_script(evaluator, preamble, dir, executable, script, args):
-    if glob(dir + "/*"):
-        raise Exception("directory: %s not empty" % dir) 
-    if not os.path.exists(dir):
+    # if glob(dir + "/*"):
+    #     raise Exception("directory: %s not empty" % dir) 
+    try:
         os.mkdir(dir)
+    except:
+        pass
+    if not os.path.exists(dir):
+        raise Exception("cannot create directory")
     with NamedTemporaryFile(dir=dir) as args_:
         args_.file.write(json.dumps(args))
         args_.file.flush()
         cmd = "%s %s %s" % (executable, script, args_.name)
         ret = _eval_cmd(evaluator, preamble, dir, cmd)
     return ret
-
 
 def write_template(fn, lang="python"):
     """
@@ -173,7 +176,7 @@ def script(inbox, cfg):
             base = cfg["id"]
         else:
             pfx = args["in"][cfg["in"][0]].split("/")[-1].split(".")[0] + "_"
-            base = cfg["id"] + "#" + out_port 
+            base = cfg["id"] + "$" + out_port 
         if out_ext:
             out_path = cfg["dir"] + "/" + pfx + base + "." + out_ext
         else:
