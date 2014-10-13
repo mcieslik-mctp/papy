@@ -15,6 +15,6 @@ the "stride" and "buffer" arguments. Unlike ``imap``, ``NuMap`` supports
 The package is tested on Python 2.6+
 
 """
-__author__ = 'Marcin Cieslik <mpc4p@virginia.edu>'
+__version__ = "1.0.6"
 
 from .NuMap import NuMap, imports

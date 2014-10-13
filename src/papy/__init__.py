@@ -10,7 +10,7 @@ workflows.
 The package is tested on Python 2.7
 
 """
-__author__ = 'Marcin Cieslik <mpc4p@virginia.edu>'
+__version__ = "1.0.6"
 
 from .core import Worker, Piper, Dagger, Plumber
 from .core import WorkerError, PiperError, DaggerError, PlumberError
