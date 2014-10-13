@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick Introduction &mdash; PaPy 1.0 documentation</title>
+    <title>Quick Introduction &mdash; PaPy 1.0.6 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.0',
+        URL_ROOT:    './',
+        VERSION:     '1.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="top" title="PaPy 1.0.6 documentation" href="index.html" />
     <link rel="next" title="Architecture" href="architecture.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -45,7 +43,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">PaPy 1.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -108,7 +106,8 @@ It is possible that multiple processing nodes share a single resource pool.</p>
 <h3>Writing a worker function<a class="headerlink" href="#writing-a-worker-function" title="Permalink to this headline">¶</a></h3>
 <p><strong>PaPy</strong> imposes restrictions on the inputs and outputs of a worker function.
 Further we recommend a generic way to construct a pipeline:</p>
-<div class="highlight-python"><pre>input_iterator -&gt; input_piper -&gt; ... processing pipers ... -&gt; output_piper</pre>
+<div class="highlight-python"><div class="highlight"><pre>input_iterator -&gt; input_piper -&gt; ... processing pipers ... -&gt; output_piper
+</pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">input_piper</span></tt> should transform input data items into a specific Python
 objects. Processing pipers should manipulate or transform this objects finally
@@ -173,13 +172,14 @@ constructed:</p>
 </div>
 <p>If a worker is constructed from multiple functions i.e. &#8220;sum the two
 inputs and multiply the result by 2&#8221;:</p>
-<div class="highlight-python"><pre># positional arguments
+<div class="highlight-python"><div class="highlight"><pre># positional arguments
 sum_and_multiply_by_2 = Worker((calculator, multiply_by), \
-                               (('sum',),   (3,))):
+                               ((&#39;sum&#39;,),   (3,))):
 # keyworded arguments
 sum_and_multiply_by_2 = Worker((calculator, multiply_by), \
                                 kwargs = \
-                               ({'operation':'sum'}, {'number':3}))</pre>
+                               ({&#39;operation&#39;:&#39;sum&#39;}, {&#39;number&#39;:3}))
+</pre></div>
 </div>
 <p>In the last example the second argument given is in the first version a
 tuple of tuples which are the positional arguments for the function or
@@ -251,12 +251,12 @@ as in the second example a tuple of dictionaries with named arguments.</p>
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">PaPy 1.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Marcin Cieslik.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Marcin Cieslik.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

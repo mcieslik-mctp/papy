@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Architecture &mdash; PaPy 1.0 documentation</title>
+    <title>Architecture &mdash; PaPy 1.0.6 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.0',
+        URL_ROOT:    './',
+        VERSION:     '1.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="top" title="PaPy 1.0.6 documentation" href="index.html" />
     <link rel="next" title="About the Parallelism in PaPy" href="parallelism.html" />
     <link rel="prev" title="Quick Introduction" href="first.html" /> 
   </head>
@@ -45,7 +43,7 @@
         <li class="right" >
           <a href="first.html" title="Quick Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">PaPy 1.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -272,12 +270,13 @@ only streams from certain imput pipes. For example a <tt class="docutils literal
 </ul>
 </div></blockquote>
 <p>For example:</p>
-<div class="highlight-python"><pre>from papy.util.func import *
+<div class="highlight-python"><div class="highlight"><pre>from papy.util.func import *
 worker = Worker(ipasser, (0,)) # passes only the first pipe
 worker = Worker(ipasser, (1,)) # passes only the second pipe
 worker = Worker(npasser, (2,)) # passes the first two pipes
 worker = Worker(spasser, ((0,1),) # passes pipes 0 and 1
-worker = Worker(spasser, ((1,0),) # passes pipes 1 and 0</pre>
+worker = Worker(spasser, ((1,0),) # passes pipes 1 and 0
+</pre></div>
 </div>
 <p>The output of the passes is a <em>single</em> tuple of the passed pipes:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">input0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
@@ -511,7 +510,7 @@ This can be illustraded as follows:</p>
 <p>If the <tt class="docutils literal"><span class="pre">Pipers</span></tt> <tt class="docutils literal"><span class="pre">plus2</span></tt> and <tt class="docutils literal"><span class="pre">plus1</span></tt> share a single <tt class="docutils literal"><span class="pre">NuMap</span></tt> and the
 &#8220;stride&#8221; is <tt class="docutils literal"><span class="pre">2</span></tt> then the order of evaluation can be (if the results are
 retrieved):</p>
-<div class="highlight-python"><pre>temp1 = plus2(1)
+<div class="highlight-python"><div class="highlight"><pre>temp1 = plus2(1)
 temp2 = plus2(2)
 plus1(temp1)
 plus1(temp2)
@@ -522,7 +521,8 @@ temp2 = plus2(4)
 plus1(temp1)
 plus1(temp2)
 &lt;&lt;return&gt;&gt;
-&lt;&lt;return&gt;&gt;</pre>
+&lt;&lt;return&gt;&gt;
+</pre></div>
 </div>
 <p>Now let&#8217;s assume the the stop method has been called just after <tt class="docutils literal"><span class="pre">plus2(1)</span></tt>. We
 do not want to loose the <tt class="docutils literal"><span class="pre">temp1</span></tt> result (as <tt class="docutils literal"><span class="pre">1</span></tt> has been already consumed
@@ -582,8 +582,9 @@ directed edges (downstream &#8211;&gt; upstream), while the <tt class="docutils 
 the concept of pipes to ease the understanding of <strong>PaPy</strong> and make mistakes
 less common. A pipe is nothing else then a reversed edge. To make this
 explicit:</p>
-<div class="highlight-python"><pre>input -&gt; piper0 -&gt; piper1 -&gt; output # -&gt; represents a pipe (data-flow)
-input &lt;- piper0 &lt;- piper1 &lt;- output # &lt;- represents an edge (dependancy)</pre>
+<div class="highlight-python"><div class="highlight"><pre>input -&gt; piper0 -&gt; piper1 -&gt; output # -&gt; represents a pipe (data-flow)
+input &lt;- piper0 &lt;- piper1 &lt;- output # &lt;- represents an edge (dependancy)
+</pre></div>
 </div>
 <p>The data is stored internally as edges, but the interface uses pipes. Method
 names are explicit.:</p>
@@ -607,7 +608,7 @@ is created without any arguments to the constructor.:</p>
 </pre></div>
 </div>
 <p>Optionally a set of <tt class="docutils literal"><span class="pre">Pipers</span></tt> and/or pipes can be given:</p>
-<div class="highlight-python"><pre>dagger_instance = Dagger(sequence_of_pipers, sequence_of_pipes)
+<div class="highlight-python"><div class="highlight"><pre>dagger_instance = Dagger(sequence_of_pipers, sequence_of_pipes)
 # which is equivalent to:
 dagger_instance.add_pipers(sequence_of_pipers)
 dagger_instance.add_pipes(sequence_of_pipes)
@@ -615,7 +616,8 @@ dagger_instance.add_pipes(sequence_of_pipes)
 dagger_instance.add_pipers([1, 2a, 3a, 4])
 dagger_instance.add_pipers([1, 2b, 3b, 4])
 # in this example a Dagger will have 6 pipers (1, 2a, 2b, 3a, 3b, 4), one
-# branch point 1, one merge point 4, and two branches (2a, 3a) and (2b, 3b).</pre>
+# branch point 1, one merge point 4, and two branches (2a, 3a) and (2b, 3b).
+</pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Dagger</span></tt> allows to add/delete <tt class="docutils literal"><span class="pre">Pipers</span></tt> and pipes:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">dagger_instance</span><span class="o">.</span><span class="n">add_piper</span><span class="p">(</span><span class="sb">``</span><span class="n">Piper</span><span class="sb">``</span><span class="p">)</span>
@@ -823,12 +825,12 @@ Python process.</p>
         <li class="right" >
           <a href="first.html" title="Quick Introduction"
              >previous</a> |</li>
-        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">PaPy 1.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Marcin Cieslik.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Marcin Cieslik.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

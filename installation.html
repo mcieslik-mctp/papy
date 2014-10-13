@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; PaPy 1.0 documentation</title>
+    <title>Installation &mdash; PaPy 1.0.6 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.0',
+        URL_ROOT:    './',
+        VERSION:     '1.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="PaPy 1.0 documentation" href="index.html" />
+    <link rel="top" title="PaPy 1.0.6 documentation" href="index.html" />
     <link rel="next" title="Quick Introduction" href="first.html" />
     <link rel="prev" title="Introduction" href="bullets.html" /> 
   </head>
@@ -45,7 +43,7 @@
         <li class="right" >
           <a href="bullets.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">PaPy 1.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -71,7 +69,8 @@ read further choose the fancy way of installing <strong>PaPy</strong>.</p>
 <h2>Installing <strong>PaPy</strong> the easy way<a class="headerlink" href="#installing-papy-the-easy-way" title="Permalink to this headline">¶</a></h2>
 <p><strong>PaPy</strong> is indexed on the <strong>PyPI</strong> (Python Package Index). And can be installed
 simply via:</p>
-<div class="highlight-python"><pre>$ su -c "easy_install papy"</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ su -c &quot;easy_install papy&quot;
+</pre></div>
 </div>
 <p>This will install the <tt class="docutils literal"><span class="pre">papy</span></tt>, <tt class="docutils literal"><span class="pre">numap</span></tt>, <tt class="docutils literal"><span class="pre">nubio</span></tt>, <tt class="docutils literal"><span class="pre">nubox</span></tt> and <tt class="docutils literal"><span class="pre">rpyc</span></tt>
 packages. If this did  not work please try to use the manual source code
@@ -82,11 +81,12 @@ distributions.</p>
 <a class="reference external" href="http://muralab.org/papy">http://muralab.org/papy</a></p>
 </li>
 <li><p class="first">install it via easy_install:</p>
-<div class="highlight-python"><pre>$ su -c "easy_install rpyc_YYY.tar.gz"
-$ su -c "easy_install numap_YYY.tar.gz"
-$ su -c "easy_install nubox_YY.tar.gz"
-$ su -c "easy_install nubio_YYY.tar.gz"
-$ su -c "easy_install papy_YYY.tar.gz"</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ su -c &quot;easy_install rpyc_YYY.tar.gz&quot;
+$ su -c &quot;easy_install numap_YYY.tar.gz&quot;
+$ su -c &quot;easy_install nubox_YY.tar.gz&quot;
+$ su -c &quot;easy_install nubio_YYY.tar.gz&quot;
+$ su -c &quot;easy_install papy_YYY.tar.gz&quot;
+</pre></div>
 </div>
 <p>replacing XXX with the version numbers of the downloaded files.</p>
 </li>
@@ -121,18 +121,21 @@ something UNIX-like.</p>
 <p>Most Linux distributions and Mac OSX ship a recent version of Python. You can
 (and should) skip this step if you have Python 2.6 and it is the default Python
 interpreter.  To check this open a shell and type:</p>
-<div class="highlight-python"><pre>$ python</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ python
+</pre></div>
 </div>
 <p>This should return something similar to this:</p>
-<div class="highlight-python"><pre>Python 2.6.2 (r262:71600, Jun 12 2009, 10:38:05)
+<div class="highlight-python"><div class="highlight"><pre>Python 2.6.2 (r262:71600, Jun 12 2009, 10:38:05)
 [GCC 4.1.2 (Gentoo 4.1.2 p1.1)] on linux2
-Type "help", "copyright", "credits" or "license" for more information.</pre>
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+</pre></div>
 </div>
 <p>Notice the version in the first line. If it is is not 2.6.x or higher, but not
 3.X skip this section as you already have a supported Python version. Otherwise
 it might be that your operating system still provides you a Python 2.6, but the
 name of the executable is different try:</p>
-<div class="highlight-python"><pre>$ python2.6</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ python2.6
+</pre></div>
 </div>
 <p>If, and only if, this fails with <tt class="docutils literal"><span class="pre">python2.6:</span> <span class="pre">command</span> <span class="pre">not</span> <span class="pre">found</span></tt> or
 something similar proceed with the manual system-wide installation of Python 2.6
@@ -148,7 +151,8 @@ source tarball and the highest 2.6.x version available. You do not want
 to install Python 3.0.x or 3.1.x</p>
 </li>
 <li><p class="first">Unpack the compressed tarball intp any directory e.g.:</p>
-<div class="highlight-python"><pre>tar xfv Python-2.6.2.tgz</pre>
+<div class="highlight-python"><div class="highlight"><pre>tar xfv Python-2.6.2.tgz
+</pre></div>
 </div>
 </li>
 <li><p class="first">go to the root of the unpacked directory and compile Python2.6:</p>
@@ -161,7 +165,8 @@ su -c &#8220;make altinstall&#8221;</p>
 <p>this will install an executable <tt class="docutils literal"><span class="pre">python2.6</span></tt> into <tt class="docutils literal"><span class="pre">/usr/bin</span></tt></p>
 </li>
 <li><p class="first">try if it worked:</p>
-<div class="highlight-python"><pre>$ python2.6</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ python2.6
+</pre></div>
 </div>
 </li>
 </ol>
@@ -177,19 +182,21 @@ safe side.</p>
 sandbox environment and <strong>PaPy</strong>&#8216;s dependencies. This is a very common package
 and is most likely  already installed. But we need it for explicitly for
 Python 2.6. To test if it is there it try:</p>
-<div class="highlight-python"><pre>$ easy_install2.6</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ easy_install2.6
+</pre></div>
 </div>
 <p>If you encounter an error, and you did <strong>not</strong> build Python 2.6 manually you
 should try to install it from your distribution&#8217;s repository. On Gentoo the
 package is called &#8220;dev-python/setuptools&#8221; on Fedora it is &#8220;python-setuptools&#8221;
 and &#8220;python-setuptools-devel&#8221; for Ubuntu the package is called
 &#8220;python-setuptools&#8221; You can install them by e.g.:</p>
-<div class="highlight-python"><pre># Gentoo
-$ su -c "emerge setuptools"
+<div class="highlight-python"><div class="highlight"><pre># Gentoo
+$ su -c &quot;emerge setuptools&quot;
 # Ubuntu
 $ sudo apt-get install python-setuptools
 # Fedora
-$ su -c "yum install python-setuptools"</pre>
+$ su -c &quot;yum install python-setuptools&quot;
+</pre></div>
 </div>
 <p>If you had to manually compile Python 2.6 the standard distribution setuptools
 package are most likely installed but only for the default system-wide Python
@@ -202,11 +209,13 @@ want the latest source version at the time of writing it is
 setuptools-0.6c11.tar.gz.</p>
 </li>
 <li><p class="first">Unpack the compressed tarball into any directory:</p>
-<div class="highlight-python"><pre>$ tar xvf setuptools-0.6c11.tar.gz</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ tar xvf setuptools-0.6c11.tar.gz
+</pre></div>
 </div>
 </li>
 <li><p class="first">Go to the root of the extracted directory:</p>
-<div class="highlight-python"><pre>$ cd setuptools-0.6c11</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ cd setuptools-0.6c11
+</pre></div>
 </div>
 </li>
 <li><p class="first">Now we install setuptools using the python 2.6 executable, but first we
@@ -219,32 +228,36 @@ the following and just issue:</p>
 </div></blockquote>
 <p>To prevent overriding <tt class="docutils literal"><span class="pre">/usr/bin/easy_install</span></tt> we edit the <tt class="docutils literal"><span class="pre">setupy.py</span></tt>
 file:</p>
-<div class="highlight-python"><pre>&lt;snip&gt;
-"console_scripts": [
-    "easy_install = setuptools.command.easy_install:main",
-    "easy_install-%s = setuptools.command.easy_install:main"
+<div class="highlight-python"><div class="highlight"><pre>&lt;snip&gt;
+&quot;console_scripts&quot;: [
+    &quot;easy_install = setuptools.command.easy_install:main&quot;,
+    &quot;easy_install-%s = setuptools.command.easy_install:main&quot;
     % sys.version[:3]],
-&lt;snip&gt;</pre>
+&lt;snip&gt;
+</pre></div>
 </div>
 <p>by commenting out the second line i.e.:</p>
-<div class="highlight-python"><pre>&lt;snip&gt;
-"console_scripts": [
-#   "easy_install = setuptools.command.easy_install:main",
-    "easy_install-%s = setuptools.command.easy_install:main"
+<div class="highlight-python"><div class="highlight"><pre>&lt;snip&gt;
+&quot;console_scripts&quot;: [
+#   &quot;easy_install = setuptools.command.easy_install:main&quot;,
+    &quot;easy_install-%s = setuptools.command.easy_install:main&quot;
     % sys.version[:3]],
-&lt;snip&gt;</pre>
+&lt;snip&gt;
+</pre></div>
 </div>
 </li>
 <li><p class="first">now we can safely run the installation:</p>
-<div class="highlight-python"><pre>$ python2.6 setup.py install</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ python2.6 setup.py install
+</pre></div>
 </div>
 </li>
 <li><p class="first">and verify that we have to type <tt class="docutils literal"><span class="pre">easy_install-2.6</span></tt>:</p>
-<div class="highlight-python"><pre># CORRECT
+<div class="highlight-python"><div class="highlight"><pre># CORRECT
 $ easy_install-2.6
 error: No urls, filenames, or requirements specified (see --help)
 # NOT CORRECT
--bash: easy_install-2.6: command not found</pre>
+-bash: easy_install-2.6: command not found
+</pre></div>
 </div>
 </li>
 </ol>
@@ -258,35 +271,41 @@ of <strong>PaPy</strong> might be easier in a virtual environment. We will creat
 environment just for <strong>PaPy</strong>. We will install virtualenv and virtualenvwrapper
 into the newly created Python installation or standard Python2.6 using
 easy_install-2.6.:</p>
-<div class="highlight-python"><pre>$ su -c "easy_install-2.6 virtualenv"
-$ su -c "easy_install-2.6 virtualenvwrapper"</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ su -c &quot;easy_install-2.6 virtualenv&quot;
+$ su -c &quot;easy_install-2.6 virtualenvwrapper&quot;
+</pre></div>
 </div>
 <p>Note that these packages are installed system-wide. Now we have to configure
 virtualenvwrapper on a per-user basis. We have to edit  the <tt class="docutils literal"><span class="pre">.bashrc</span></tt> file.</p>
 <blockquote>
 <div><ol class="arabic">
 <li><p class="first">determine where the wrapper got installed:</p>
-<div class="highlight-python"><pre>$ which virtualenvwrapper.sh</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ which virtualenvwrapper.sh
+</pre></div>
 </div>
 </li>
 <li><p class="first">create a directory where you will hold the virtual enviroment(s):</p>
-<div class="highlight-python"><pre>$ mkdir $HOME/.virtualenvs</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir $HOME/.virtualenvs
+</pre></div>
 </div>
 </li>
 <li><p class="first">add the following two lines to <tt class="docutils literal"><span class="pre">~/.bashrc</span></tt> replace __REPLACE_ME__ with
 whatever the output from the first command was.:</p>
-<div class="highlight-python"><pre>export WORKON_HOME=$HOME/.virtualenvs
-source __REPLACE_ME__</pre>
+<div class="highlight-python"><div class="highlight"><pre>export WORKON_HOME=$HOME/.virtualenvs
+source __REPLACE_ME__
+</pre></div>
 </div>
 </li>
 </ol>
 </div></blockquote>
 <p>Now we have to source the edited <tt class="docutils literal"><span class="pre">.bashrc</span></tt> file:</p>
-<div class="highlight-python"><pre>$ source ~/.bashrc</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ source ~/.bashrc
+</pre></div>
 </div>
 <p>This should not generate any errors. We are finally ready to create a virtual
 Python2.6 environment for <strong>PaPy</strong>.:</p>
-<div class="highlight-python"><pre>$ mkvirtualenv -p python2.6 --no-site-packages papy26</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ mkvirtualenv -p python2.6 --no-site-packages papy26
+</pre></div>
 </div>
 <p>This will install a clean virtual environment called papy26 and activate it.
 Working with virtual environments is easy. To use it type <tt class="docutils literal"><span class="pre">workon</span> <span class="pre">papy26</span></tt>
@@ -296,28 +315,33 @@ to leave it type <tt class="docutils literal"><span class="pre">deactivate</span
 <h3>Installing <strong>PaPy</strong> dependencies and tools<a class="headerlink" href="#installing-papy-dependencies-and-tools" title="Permalink to this headline">¶</a></h3>
 <p>First we have to switch to the virtual environement to host all <strong>PaPy</strong> related
 code:</p>
-<div class="highlight-python"><pre>$ workon papy26</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ workon papy26
+</pre></div>
 </div>
 <p>Next we install various librarires on which <strong>PaPy</strong> depends. The general
 install command is:</p>
-<div class="highlight-python"><pre>$ easy_install-2.6 PACKAGE_NAME</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ easy_install-2.6 PACKAGE_NAME
+</pre></div>
 </div>
 <p>You do not have to be root to install the packages into the virtual
 environement:</p>
 <blockquote>
 <div><ol class="arabic">
 <li><p class="first">installing RPyC to use <strong>PaPy</strong> on a grid:</p>
-<div class="highlight-python"><pre>$ easy_install-2.6 papy</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ easy_install-2.6 papy
+</pre></div>
 </div>
 </li>
 <li><p class="first">install Sphinx to build <strong>PaPy</strong> documentation:</p>
-<div class="highlight-python"><pre>$ easy_install-2.6 sphinx</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ easy_install-2.6 sphinx
+</pre></div>
 </div>
 <p>If the above did not work because e.g. some of the tarfiles could not be
 downloaded we have to download snapshots manually from
 <a class="reference external" href="http://muralab.org/papy/downloads">http://muralab.org/papy/downloads</a> to install the libraries. The general
 installation command is:</p>
-<div class="highlight-python"><pre>$ easy_install-2.6 PACKAGE_NAME.tar.gz</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ easy_install-2.6 PACKAGE_NAME.tar.gz
+</pre></div>
 </div>
 <p>The required packages are <tt class="docutils literal"><span class="pre">rpyc</span></tt>, <tt class="docutils literal"><span class="pre">nubox</span></tt>, <tt class="docutils literal"><span class="pre">numap</span></tt> and <tt class="docutils literal"><span class="pre">nubio</span></tt>.</p>
 </li>
@@ -334,16 +358,18 @@ repository).</p>
 <blockquote>
 <div><ol class="arabic">
 <li><p class="first">make sure you have subversion:</p>
-<div class="highlight-python"><pre>$ svn
-Type 'svn help' for usage.</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ svn
+Type &#39;svn help&#39; for usage.
+</pre></div>
 </div>
 <p>If this returns an error you have to install the <tt class="docutils literal"><span class="pre">subversion</span></tt> package:</p>
-<div class="highlight-python"><pre># on Gentoo
-$ su -c "emerge subversion"
+<div class="highlight-python"><div class="highlight"><pre># on Gentoo
+$ su -c &quot;emerge subversion&quot;
 # on Fedora
-$ su -c "yum install subversion"
+$ su -c &quot;yum install subversion&quot;
 # On Ubuntu
-$ sudo apt-get install subversion</pre>
+$ sudo apt-get install subversion
+</pre></div>
 </div>
 </li>
 <li><p class="first">create a workspace to hold the source code</p>
@@ -357,22 +383,25 @@ $ sudo apt-get install subversion</pre>
 </div></blockquote>
 </li>
 <li><p class="first">switch to the <tt class="docutils literal"><span class="pre">papy26_dev</span></tt> environment:</p>
-<div class="highlight-python"><pre>$ workon papy26_dev</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ workon papy26_dev
+</pre></div>
 </div>
 </li>
 <li><p class="first">add all the required source code directories:</p>
-<div class="highlight-python"><pre>$ add2virtualenv ~/workspace/papy/src
+<div class="highlight-python"><div class="highlight"><pre>$ add2virtualenv ~/workspace/papy/src
 $ add2virtualenv ~/workspace/numap/src
 $ add2virtualenv ~/workspace/nubio/src
-$ add2virtualenv ~/workspace/nubox/src</pre>
+$ add2virtualenv ~/workspace/nubox/src
+</pre></div>
 </div>
 </li>
 <li><p class="first">Verify it worked.:</p>
-<div class="highlight-python"><pre>$ python2.6
+<div class="highlight-python"><div class="highlight"><pre>$ python2.6
 &gt;&gt;&gt; import papy
 &gt;&gt;&gt; import nubio
 &gt;&gt;&gt; import nubox
-&gt;&gt;&gt; import NuMap</pre>
+&gt;&gt;&gt; import NuMap
+</pre></div>
 </div>
 </li>
 </ol>
@@ -445,12 +474,12 @@ $ add2virtualenv ~/workspace/nubox/src</pre>
         <li class="right" >
           <a href="bullets.html" title="Introduction"
              >previous</a> |</li>
-        <li><a href="index.html">PaPy 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">PaPy 1.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Marcin Cieslik.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Marcin Cieslik.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
