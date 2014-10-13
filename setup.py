@@ -31,7 +31,7 @@ setup(
     keywords='multiprocessing, parallel, distributed, pool, imap, workflow, pipeline, flow-based',
     author='Marcin Cieslik',
     author_email='mcieslik@med.umich.edu',
-    url='http://http://mcieslik-mctp.github.io/papy/',
+    url='http://mcieslik-mctp.github.io/papy/',
     license='BSD',
     long_description=open('README.rst', 'r').read(),
     classifiers=CLASSIFIERS,
