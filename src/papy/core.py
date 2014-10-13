@@ -13,9 +13,8 @@ from types import FunctionType
 from inspect import isbuiltin, getsource
 from itertools import izip, imap, chain, repeat, tee
 from threading import Thread, Event, Lock
-from multiprocessing import TimeoutError
+from multiprocessing import TimeoutError, get_logger
 from collections import defaultdict
-from logging import getLogger
 from time import time
 import itertools, os, sys
 
@@ -24,9 +23,17 @@ from numap.NuMap import _inject_func, imports, _Weave
 # self-imports
 from graph import DictGraph
 from util.codefile import I_SIG, L_SIG, P_LAY, P_SIG, W_SIG
-from util.config import start_logger, get_defaults
+from util.config import get_defaults
 from util.runtime import get_runtime
 
+import logging
+import multiprocessing
+logging.addLevelName(23, "DEFAULT")
+logging.addLevelName(21, "SUBDEFAULT")
+multiprocessing.DEFAULT = 23
+multiprocessing.SUBDEFAULT = 21
+DEFAULT = 23
+SUBDEFAULT = 21
 
 class WorkerError(Exception):
     """
@@ -79,8 +86,8 @@ class Dagger(DictGraph):
     """
 
     def __init__(self, pipers=(), pipes=(), xtras=None):
-        self.log = getLogger('papy')
-        self.log.info('Creating %s from %s and %s' % \
+        self.log = get_logger()
+        self.log.debug('Creating %s from %s and %s' % \
                       (repr(self), pipers, pipes))
         self.add_pipers(pipers, xtras)
         self.add_pipes(pipes)
@@ -146,9 +153,9 @@ class Dagger(DictGraph):
         except (TypeError, IndexError):
             resolved = False
         if resolved:
-            self.log.info('%s resolved a piper from %s' % (repr(self), piper))
+            self.log.debug('%s resolved a piper from %s' % (repr(self), piper))
         else:
-            self.log.info('%s could not resolve a piper from %s' % \
+            self.log.debug('%s could not resolve a piper from %s' % \
                           (repr(self), repr(piper)))
             if not forgive:
                 raise DaggerError('%s could not resolve a Piper from %s' % \
@@ -173,7 +180,7 @@ class Dagger(DictGraph):
             self.connect_inputs(datas)
         # connect the remaining pipers
         postorder = self.postorder()
-        self.log.info('%s trying to connect in the order %s' % \
+        self.log.debug('%s trying to connect in the order %s' % \
                       (repr(self), repr(postorder)))
         for piper in postorder:
             if not piper.connected and self[piper].nodes():
@@ -184,7 +191,7 @@ class Dagger(DictGraph):
                 inputs.sort(cmp=self.children_after_parents)
                 # 2. branch age sorted inputs
                 piper.connect(inputs)
-        self.log.info('%s succesfuly connected' % repr(self))
+        self.log.debug('%s succesfuly connected' % repr(self))
 
     def connect_inputs(self, datas):
         """
@@ -203,11 +210,11 @@ class Dagger(DictGraph):
         
         """
         start_pipers = self.get_inputs()
-        self.log.info('%s trying to connect inputs in the order %s' % \
+        self.log.debug('%s trying to connect inputs in the order %s' % \
                       (repr(self), repr(start_pipers)))
         for piper, data in izip(start_pipers, datas):
             piper.connect([data])
-        self.log.info('%s succesfuly connected inputs' % repr(self))
+        self.log.debug('%s succesfuly connected inputs' % repr(self))
 
     def disconnect(self, forced=False):
         """
@@ -224,13 +231,13 @@ class Dagger(DictGraph):
         
         """
         reversed_postorder = reversed(self.postorder())
-        self.log.info('%s trying to disconnect in the order %s' % \
+        self.log.debug('%s trying to disconnect in the order %s' % \
                       (repr(self), repr(reversed_postorder)))
         for piper in reversed_postorder:
             if piper.connected:
                 # we don't want to trigger an exception
                 piper.disconnect(forced)
-        self.log.info('%s succesfuly disconnected' % repr(self))
+        self.log.debug('%s succesfuly disconnected' % repr(self))
 
     def start(self):
         """
@@ -252,12 +259,12 @@ class Dagger(DictGraph):
         Stops the ``Pipers`` according to pipeline topology.
         
         """
-        self.log.info('%s begins stopping routine' % repr(self))
-        self.log.info('%s triggers stopping in input pipers' % repr(self))
+        self.log.debug('%s begins stopping routine' % repr(self))
+        self.log.debug('%s triggers stopping in input pipers' % repr(self))
         inputs = self.get_inputs()
         for piper in inputs:
             piper.stop(forced=True)
-        self.log.info('%s pulls output pipers until stop' % repr(self))
+        self.log.debug('%s pulls output pipers until stop' % repr(self))
         outputs = self.get_outputs()
         while outputs:
             for piper in outputs:
@@ -281,7 +288,7 @@ class Dagger(DictGraph):
         for piper in inputs:
             if hasattr(piper.imap, 'stop'):
                 piper.imap.stop(ends=[0])
-        self.log.info('%s finishes stopping routine' % repr(self))
+        self.log.debug('%s finishes stopping routine' % repr(self))
 
     def get_inputs(self):
         """
@@ -290,7 +297,7 @@ class Dagger(DictGraph):
         
         """
         start_p = [p for p in self.postorder() if not self.outgoing_edges(p)]
-        self.log.info('%s got input pipers %s' % (repr(self), start_p))
+        self.log.debug('%s got input pipers %s' % (repr(self), start_p))
         return start_p
 
     def get_outputs(self):
@@ -300,7 +307,7 @@ class Dagger(DictGraph):
         
         """
         end_p = [p for p in self.postorder() if not self.incoming_edges(p)]
-        self.log.info('%s got output pipers %s' % (repr(self), end_p))
+        self.log.debug('%s got output pipers %s' % (repr(self), end_p))
         return end_p
 
     def add_piper(self, piper, xtra=None, create=True, branch=None):
@@ -323,7 +330,7 @@ class Dagger(DictGraph):
             properties.
         
         """
-        self.log.info('%s trying to add piper %s' % (repr(self), piper))
+        self.log.debug('%s trying to add piper %s' % (repr(self), piper))
         piper = (self.resolve(piper, forgive=True) or piper)
         if not isinstance(piper, Piper):
             if create:
@@ -341,7 +348,7 @@ class Dagger(DictGraph):
                                   (repr(self), repr(piper)))
         new_piper_created = self.add_node(piper, xtra, branch)
         if new_piper_created:
-            self.log.info('%s added piper %s' % (repr(self), piper))
+            self.log.debug('%s added piper %s' % (repr(self), piper))
         return (new_piper_created, piper)
 
     def del_piper(self, piper, forced=False):
@@ -357,7 +364,7 @@ class Dagger(DictGraph):
             will also remove it.
             
         """
-        self.log.info('%s trying to delete piper %s' % \
+        self.log.debug('%s trying to delete piper %s' % \
                       (repr(self), repr(piper)))
         try:
             piper = self.resolve(piper, forgive=False)
@@ -372,7 +379,7 @@ class Dagger(DictGraph):
             raise DaggerError('%s piper %s has down-stream pipers (use forced =True to override)' % \
                               (repr(self), piper))
         self.del_node(piper)
-        self.log.info('%s deleted piper %s' % (repr(self), piper))
+        self.log.debug('%s deleted piper %s' % (repr(self), piper))
 
     def add_pipe(self, pipe, branch=None):
         """
@@ -391,7 +398,7 @@ class Dagger(DictGraph):
 
         """
         #TODO: Check if consume/spawn/produce is right!
-        self.log.info('%s adding pipe: %s' % (repr(self), repr(pipe)))
+        self.log.debug('%s adding pipe: %s' % (repr(self), repr(pipe)))
         for i in xrange(len(pipe) - 1):
             edge = (pipe[i + 1], pipe[i])
             edge = (self.add_piper(edge[0], create=True, branch=branch)[1], \
@@ -403,7 +410,7 @@ class Dagger(DictGraph):
                                 (repr(self), edge[0], edge[1]))
             self.add_edge(edge)
             self.clear_nodes() #dfs
-            self.log.info('%s added the %s>>>%s edge' % \
+            self.log.debug('%s added the %s>>>%s edge' % \
                           (repr(self), edge[0], edge[1]))
 
     def del_pipe(self, pipe, forced=False):
@@ -428,13 +435,13 @@ class Dagger(DictGraph):
             only ``Pipers`` with no outgoing pipes will be deleted.
 
         """
-        self.log.info('%s removes pipe%s forced: %s' % \
+        self.log.debug('%s removes pipe%s forced: %s' % \
                       (repr(self), repr(pipe), forced))
         pipe = list(reversed(pipe))
         for i in xrange(len(pipe) - 1):
             edge = (self.resolve(pipe[i]), self.resolve(pipe[i + 1]))
             self.del_edge(edge)
-            self.log.info('%s removed the %s>>>%s edge' % \
+            self.log.debug('%s removed the %s>>>%s edge' % \
                           (repr(self), edge[0], edge[1]))
             try:
                 self.del_piper(edge[0], forced)
@@ -524,10 +531,10 @@ class Plumber(Dagger):
         (internal) executes when last output piper raises ``StopIteration``.
         """
         if ispausing:
-            self.log.info('%s paused' % repr(self))
+            self.log.debug('%s paused' % repr(self))
         else:
             self._finished.set()
-            self.log.info('%s finished' % repr(self))
+            self.log.debug('%s finished' % repr(self))
 
     @staticmethod
     def _plunge(tasks, pausing, finish):
@@ -552,8 +559,8 @@ class Plumber(Dagger):
         self._pausing = Event() # during pause
         self._finished = Event() # after finishing the input
 
-        start_logger(**logger_options)
-        self.log = getLogger('papy')
+        #start_logger(**logger_options)
+        self.log = get_logger()
 
         # init
         self.filename = None
@@ -878,8 +885,8 @@ class Piper(object):
         self.tee_num = 0
         self.tees = []
 
-        self.log = getLogger('papy')
-        self.log.info('Creating a new Piper from %s' % repr(worker))
+        self.log = get_logger()
+        self.log.debug('Creating a new Piper from %s' % repr(worker))
 
         self.imap = parallel if parallel else imap # this is itetools.imap
 
@@ -892,10 +899,10 @@ class Piper(object):
         elif is_w:
             self.worker = worker
         elif is_f or is_if or is_iw:
-            self.log.info('Creating new worker from %s' % worker)
+            self.log.debug('Creating new worker from %s' % worker)
             try:
                 self.worker = Worker(worker)
-                self.log.info('Created a new worker from %s' % worker)
+                self.log.debug('Created a new worker from %s' % worker)
             except Exception, excp:
                 self.log.error('Could not create a new Worker from %s' % \
                                 worker)
@@ -910,7 +917,7 @@ class Piper(object):
         # initially return self by __iter__
         self._iter = self
         self.name = name or "piper_%s" % id(self)
-        self.log.info('Created Piper %s' % self)
+        self.log.debug('Created Piper %s' % self)
 
     def __iter__(self):
         """
@@ -965,12 +972,12 @@ class Piper(object):
             # parallel piper
             self.imap.start(stages)
             if 2 in stages:
-                self.log.info('Piper %s has been started using %s' % \
+                self.log.debug('Piper %s has been started using %s' % \
                               (self, self.imap))
                 self.started = True
         else:
             # linear piper
-            self.log.info('Piper %s has been started using %s' % \
+            self.log.debug('Piper %s has been started using %s' % \
                           (self, self.imap))
             self.started = True
 
@@ -1004,7 +1011,7 @@ class Piper(object):
                            self)
         else:
             # not started and not connected and NuMap not started
-            self.log.info('Piper %s connects to %s' % (self, inbox))
+            self.log.debug('Piper %s connects to %s' % (self, inbox))
             # determine the stride with which result will be consumed from the
             # input.
             stride = self.imap.stride if hasattr(self.imap, 'stride') else 1
@@ -1105,7 +1112,7 @@ class Piper(object):
             if hasattr(self.imap, 'stop'):
                 self.imap.stop(forced=forced, **kwargs)
             self.started = False
-            self.log.info('Piper %s stops (finished: %s)' % \
+            self.log.debug('Piper %s stops (finished: %s)' % \
                           (self, self.finished))
 
 
@@ -1148,7 +1155,7 @@ class Piper(object):
                             self
                     self.log.error(msg)
                     raise PiperError(msg)
-            self.log.info('Piper %s disconnected from %s' % (self, self.inbox))
+            self.log.debug('Piper %s disconnected from %s' % (self, self.inbox))
             self.imap_tasks = []
             self.inbox = None
             self.outbox = None
@@ -1174,7 +1181,7 @@ class Piper(object):
         try:
             next = self.outbox.next()
         except StopIteration, excp:
-            self.log.info('Piper %s has processed all jobs (finished)' % self)
+            self.log.debug('Piper %s has processed all jobs (finished)' % self)
             self.finished = True
             # We re-raise StopIteration as part of the iterator protocol.
             # And the outbox should do the same.
@@ -1208,7 +1215,7 @@ class Piper(object):
             # Worker/PiperErrors are wrapped by workers
             if self.debug:
                 raise next
-            self.log.info('Piper %s propagates %s' % (self, next[0]))
+            self.log.debug('Piper %s propagates %s' % (self, next[0]))
         return next
 
 
