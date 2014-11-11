@@ -1,4 +1,4 @@
-0;115;0c# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # PaPy documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  4 09:23:12 2010.
