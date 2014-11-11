@@ -13,8 +13,9 @@ from types import FunctionType
 from inspect import isbuiltin, getsource
 from itertools import izip, imap, chain, repeat, tee
 from threading import Thread, Event, Lock
-from multiprocessing import TimeoutError, get_logger
+from multiprocessing import TimeoutError
 from collections import defaultdict
+from logging import getLogger
 from time import time
 import itertools, os, sys
 
@@ -25,15 +26,6 @@ from graph import DictGraph
 from util.codefile import I_SIG, L_SIG, P_LAY, P_SIG, W_SIG
 from util.config import get_defaults
 from util.runtime import get_runtime
-
-import logging
-import multiprocessing
-logging.addLevelName(23, "DEFAULT")
-logging.addLevelName(21, "SUBDEFAULT")
-multiprocessing.DEFAULT = 23
-multiprocessing.SUBDEFAULT = 21
-DEFAULT = 23
-SUBDEFAULT = 21
 
 class WorkerError(Exception):
     """
@@ -86,7 +78,7 @@ class Dagger(DictGraph):
     """
 
     def __init__(self, pipers=(), pipes=(), xtras=None):
-        self.log = get_logger()
+        self.log = getLogger("papy")
         self.log.debug('Creating %s from %s and %s' % \
                       (repr(self), pipers, pipes))
         self.add_pipers(pipers, xtras)
@@ -560,7 +552,7 @@ class Plumber(Dagger):
         self._finished = Event() # after finishing the input
 
         #start_logger(**logger_options)
-        self.log = get_logger()
+        self.log = getLogger("papy")
 
         # init
         self.filename = None
@@ -885,7 +877,7 @@ class Piper(object):
         self.tee_num = 0
         self.tees = []
 
-        self.log = get_logger()
+        self.log = getLogger("papy")
         self.log.debug('Creating a new Piper from %s' % repr(worker))
 
         self.imap = parallel if parallel else imap # this is itetools.imap

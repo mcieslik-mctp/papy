@@ -30,8 +30,8 @@ from heapq import heappush, heappop
 from itertools import izip, repeat
 from inspect import getsource, isbuiltin, isfunction
 # sets-up logging
-from multiprocessing import get_logger
-log = get_logger()
+from logging import getLogger
+log = getLogger("numap")
 import warnings
 
 

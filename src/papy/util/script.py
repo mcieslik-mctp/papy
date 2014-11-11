@@ -9,14 +9,14 @@ scripts.
 """
 import os
 import json
-import logging
 from time import sleep
 from glob import glob
 from subprocess import Popen, PIPE, CalledProcessError
 from tempfile import NamedTemporaryFile
-import multiprocessing as mp
 
-LOG = mp.get_logger()
+
+# import multiprocessing as mp
+# LOG = mp.get_logger()
 
 CMD = \
 """
@@ -160,8 +160,8 @@ def script(inbox, cfg):
     """
     script_name = cfg["id"]
     script_id = str(abs(hash((cfg["id"],) + tuple(inbox[0].values()))))[0:8]
-    LOG.log(mp.DEFAULT, "@papy;script %s:%s started" % (script_name, script_id))
-    LOG.log(mp.SUBDEFAULT, "@papy;%s:%s received: %s" % (script_name, script_id, inbox))
+    # LOG.log(mp.DEFAULT, "@papy;script %s:%s started" % (script_name, script_id))
+    # LOG.log(mp.SUBDEFAULT, "@papy;%s:%s received: %s" % (script_name, script_id, inbox))
     args = {}
     args["params"] = dict(cfg["params"])
     args["in"] = {}
@@ -194,10 +194,10 @@ def script(inbox, cfg):
     # evaluate and check for errors
     ret = _eval_script(cfg["evaluator"], cfg["preamble"], cfg["dir"], cfg["executable"], cfg["script"], args)
     if ret[0] != 0:
-        LOG.error("@papy;%s:%s %s:%s:%s" % (script_name, script_id, ret[0], 
-                                                                     ret[1].replace("\n", "<br>"), 
-                                                                     ret[2].replace("\n", "<br>")))
+        # LOG.error("@papy;%s:%s %s:%s:%s" % (script_name, script_id, ret[0], 
+        #                                                              ret[1].replace("\n", "<br>"), 
+        #                                                              ret[2].replace("\n", "<br>")))
         raise Exception(ret[0], cfg["script"], ret[1], ret[2])
-    LOG.log(mp.SUBDEFAULT, "@papy;%s:%s produced:%s" % (script_name, script_id, out))
-    LOG.log(mp.DEFAULT, "@papy;script %s:%s finished" % (script_name, script_id))
+    #LOG.log(mp.SUBDEFAULT, "@papy;%s:%s produced:%s" % (script_name, script_id, out))
+    #LOG.log(mp.DEFAULT, "@papy;script %s:%s finished" % (script_name, script_id))
     return out
