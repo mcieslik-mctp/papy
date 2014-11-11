@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 NAME = 'papy'
-VERSION = '1.0.7'
+VERSION = '1.0.8'
 
 try:
     from setuptools import setup

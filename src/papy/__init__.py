@@ -1,4 +1,4 @@
-0;115;0c# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 **PaPy** - Parallel Pipelines in Python
 #######################################
@@ -10,7 +10,7 @@ workflows.
 The package is tested on Python 2.7
 
 """
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 from .core import Worker, Piper, Dagger, Plumber
 from .core import WorkerError, PiperError, DaggerError, PlumberError

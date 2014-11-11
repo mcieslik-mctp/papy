@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.0.8
+-------------
+  
+  - garbage fixes
+
+
 Version 1.0.7
 -------------
   

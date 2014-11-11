@@ -1,4 +1,4 @@
-0;115;0c# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 **NuMap** - lazy, parallel, remote, multi-task map function
 ###########################################################
@@ -15,6 +15,6 @@ the "stride" and "buffer" arguments. Unlike ``imap``, ``NuMap`` supports
 The package is tested on Python 2.6+
 
 """
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 from .NuMap import NuMap, imports
