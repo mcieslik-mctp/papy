@@ -8,7 +8,8 @@ nested Python dictionaries. It provides ``DictNode`` and ``DictGraph``.
 
 """
 from collections import defaultdict
-from itertools import repeat, izip
+from itertools import repeat
+from builtins import zip as izip
 
 
 class DictNode(dict):
@@ -38,7 +39,7 @@ class DictNode(dict):
                 dict.__init__(self, {entity:DictNode(xtra=xtra)})
             else:
                 self.xtra = (xtra or {})
-        except Exception, excp:
+        except Exception as excp:
             raise excp
 
     def clear(self):

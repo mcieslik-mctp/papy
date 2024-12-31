@@ -11,7 +11,8 @@ pipeline.
 
 from types import FunctionType
 from inspect import isbuiltin, getsource
-from itertools import izip, imap, chain, repeat, tee
+from itertools import chain, repeat, tee
+from builtins import zip as izip, map as imap
 from threading import Thread, Event, Lock
 from multiprocessing import TimeoutError
 from collections import defaultdict
@@ -22,10 +23,10 @@ import itertools, os, sys
 from numap.NuMap import _inject_func, imports, _Weave
 
 # self-imports
-from graph import DictGraph
-from util.codefile import I_SIG, L_SIG, P_LAY, P_SIG, W_SIG
-from util.config import get_defaults
-from util.runtime import get_runtime
+from papy.graph import DictGraph
+from papy.util.codefile import I_SIG, L_SIG, P_LAY, P_SIG, W_SIG
+from papy.util.config import get_defaults
+from papy.util.runtime import get_runtime
 
 class WorkerError(Exception):
     """
@@ -268,7 +269,7 @@ class Dagger(DictGraph):
                     self.log.debug("%s stopped output piper: %s" % \
                                    (repr(self), repr(piper)))
                     continue
-                except Exception, excp:
+                except Exception as excp:
                     self.log.debug("%s %s raised an exception: %s" % \
                                    (repr(self), piper, excp))
         self.log.debug("%s stops the remaining pipers" % repr(self))
@@ -895,7 +896,7 @@ class Piper(object):
             try:
                 self.worker = Worker(worker)
                 self.log.debug('Created a new worker from %s' % worker)
-            except Exception, excp:
+            except Exception as excp:
                 self.log.error('Could not create a new Worker from %s' % \
                                 worker)
                 raise PiperError('Could not create a new Worker from %s' % \
@@ -1172,21 +1173,21 @@ class Piper(object):
         """
         try:
             next = self.outbox.next()
-        except StopIteration, excp:
+        except StopIteration as excp:
             self.log.debug('Piper %s has processed all jobs (finished)' % self)
             self.finished = True
             # We re-raise StopIteration as part of the iterator protocol.
             # And the outbox should do the same.
             raise excp
-        except (AttributeError, RuntimeError), excp:
+        except (AttributeError, RuntimeError) as excp:
             # probably self.outbox.next() is self.None.next()
             self.log.error('Piper %s has not yet been started.' % self)
             raise PiperError('Piper %s has not yet been started.' % self, excp)
-        except IndexError, excp:
+        except IndexError as excp:
             # probably started before connected
             self.log.error('Piper %s has been started before connect.' % self)
             raise PiperError('Piper %s has been started before connect.' % self, excp)
-        except TimeoutError, excp:
+        except TimeoutError as excp:
             self.log.error('Piper %s timed out waited %ss.' % \
                            (self, self.timeout))
             next = PiperError(excp)
@@ -1401,7 +1402,7 @@ class Worker(object):
                 zip(self.task, self.args, self.kwargs):
                     outbox = (func(outbox, *args, **kwargs),)
                 outbox = outbox[0]
-            except Exception, excp:
+            except Exception as excp:
                 # an exception occured in one of the f's do not raise it
                 # instead return it.
                 outbox = WorkerError(excp, func.__name__, inbox)
@@ -1478,7 +1479,7 @@ class _Consume(object):
                     res = self.iterable.next()
                 except StopIteration:
                     continue
-                except Exception, res:
+                except Exception as res:
                     pass
                 batch_buffer[stride].append(res)
 
@@ -1598,7 +1599,7 @@ class _Repeat(object):
             try:
                 results.append(self.iterable.next())
                 exceptions.append(False)
-            except Exception, excp:
+            except Exception as excp:
                 results.append(excp)
                 exceptions.append(True)
         self._repeat_buffer = repeat((results, exceptions), self.n)
@@ -1648,7 +1649,7 @@ class _Produce(_Repeat):
             try:
                 results.append(self.iterable.next())
                 exceptions.append(False)
-            except Exception, excp:
+            except Exception as excp:
                 results.append(excp)
                 exceptions.append(True)
         # un-roll the result lists
@@ -1741,9 +1742,9 @@ class _TeePiper(object):
         try:
             result = self.piper.tees[self.i].next()
             exception = False
-        except StopIteration, result:
+        except StopIteration as result:
             self.finished = True
-        except Exception, result:
+        except Exception as result:
             pass
         # release per-tee lock either self or next
         if self.s == self.stride or self.finished:

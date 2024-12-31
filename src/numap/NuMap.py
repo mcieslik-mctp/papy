@@ -23,11 +23,12 @@ except ImportError:
 # Threading and Queues
 from threading import Thread, Semaphore, Event
 from threading import Lock as tLock
-from Queue import Queue, Empty
+from queue import Queue, Empty
 # for PriorityQueue
 from heapq import heappush, heappop
 # Misc.
-from itertools import izip, repeat
+from itertools import repeat
+from builtins import zip as izip
 from inspect import getsource, isbuiltin, isfunction
 # sets-up logging
 from logging import getLogger
@@ -662,7 +663,7 @@ class NuMap(object):
                             to_do.remove(task)
                             log.debug('%s stopped task %s' % (self, task))
                             continue
-                        except Exception, excp:
+                        except Exception as excp:
                             log.debug('%s task %s raised exception %s' % \
                                       (self, task, excp))
                 # stop threads remove queues 
@@ -829,7 +830,7 @@ def imports(modules, forgive=False):
                         else:
                             module = getattr(__import__('.'.join(mod[:-1]), \
                                             fromlist=[mod[-1]]), mod[-1])
-                        f.func_globals[mod_name] = module
+                        f.__globals__[mod_name] = module
                         break # import only one
                     except ImportError:
                         pass
@@ -984,7 +985,7 @@ def _pool_worker(inqueue, outqueue, host=None):
                    _inject_func(func, conn)
         try:
             ok, result = (True, func(data, *args, **kwargs))
-        except Exception, excp:
+        except Exception as excp:
             ok, result = (False, excp)
             #gc.disable(), gc.enable()
         put((job, i, ok, result))
