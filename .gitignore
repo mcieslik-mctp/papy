@@ -1,3 +1,6 @@
+.venv
+*.code-workspace
+
 *.py[cod]
 
 # C extensions
