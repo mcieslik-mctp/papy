@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "papy"
+version = "1.0.8"
+description = "flow-based, parallel and distributed computational pipelines, includes a lazy, parallel, remote, multi-task map function"
+keywords = ["multiprocessing", "parallel", "distributed", "pool", "imap", "workflow", "pipeline", "flow-based"]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+authors = [
+    { name = "Marcin Cieslik", email = "mcieslik@med.umich.edu" }
+]
+license = { text = "BSD" }
