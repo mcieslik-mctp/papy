@@ -191,7 +191,7 @@ class NuMap(object):
         """
         log.debug('NuMap(%s) started pool_putter.' % id_self)
         last_tasks = {}
-        for task in xrange(tasks.lenght):
+        for task in range(tasks.lenght):
             last_tasks[task] = -1
         stop_tasks = []
         while True:
@@ -224,7 +224,7 @@ class NuMap(object):
                     log.debug('NuMap(%s) pool_putter sent sentinels for all tasks.' % \
                                                                         id_self)
                     # all tasks have been stopped
-                    for _worker in xrange(pool_size):
+                    for _worker in range(pool_size):
                         put_to_pool_in(None)
                     log.debug('NuMap(%s) pool_putter sent sentinel for %s workers' % \
                                                            (id_self, pool_size))
@@ -263,7 +263,7 @@ class NuMap(object):
         # know that no new results will arrive.
         sentinels = 0
         result_ids, last_result_id, very_last_result_id = {}, {}, {}
-        for i in xrange(task_num):
+        for i in range(task_num):
             last_result_id[i] = -1
             very_last_result_id[i] = -2
             result_ids[i] = set()
@@ -558,7 +558,7 @@ class NuMap(object):
                 self._tasks_tracked = {}
             elif number > 0:
                 last_task_id = len(self._tasks) - 1
-                for i in xrange(number):
+                for i in range(number):
                     self._tasks.pop()
                     self._tasks_tracked.pop(last_task_id - i, None)
         else:

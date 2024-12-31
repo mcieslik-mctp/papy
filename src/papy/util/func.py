@@ -32,7 +32,7 @@ from papy.util.runtime import get_runtime # provided by worker._inject
 PAPY_DEFAULTS = get_defaults() # init by worker._inject
 PAPY_RUNTIME = get_runtime()   # init by worker._inject
 # worker function imports
-import cPickle, json, gc, time, tempfile, errno, os, socket, urllib, stat, \
+import pickle, json, gc, time, tempfile, errno, os, socket, urllib, stat, \
        signal, mmap, warnings, threading
 
 def plugger(inbox):
@@ -137,7 +137,7 @@ def print_(inbox):
     """
     Prints the first element of the inbox.
     """
-    print inbox[0]
+    print(inbox[0])
 #
 # INPUT/OUTPUT
 #
@@ -193,7 +193,7 @@ def load_stream(handle, delimiter=None):
 
         yield "".join(item)
 
-@imports(['cPickle'])
+@imports(['pickle'])
 def load_pickle_stream(handle):
     """
     Creates an object generator from a stream (file handle) containing data
@@ -208,7 +208,7 @@ def load_pickle_stream(handle):
     """
     while True:
         try:
-            yield cPickle.load(handle)
+            yield pickle.load(handle)
         except EOFError:
             raise StopIteration
 
@@ -222,7 +222,7 @@ def dump_pickle_stream(inbox, handle):
       - handle(``file``) A file handle open for writing.    
     
     """
-    cPickle.dump(inbox[0], handle, -1)
+    pickle.dump(inbox[0], handle, -1)
 
 # ITEMS
 @imports(['tempfile', 'os', 'errno', 'mmap', 'signal', 'socket', 'urllib', \
@@ -274,17 +274,17 @@ def dump_item(inbox, type='file', prefix=None, suffix=None, dir=None, \
                 file = os.path.join(dir, file)
                 try:
                     if type == 'file':
-                        fd = os.open(file, tempfile._bin_openflags, 0600)
+                        fd = os.open(file, tempfile._bin_openflags, 0o600)
                         tempfile._set_cloexec(fd) # ?, but still open
                     elif type == 'fifo':
                         os.mkfifo(file)
                     file = os.path.abspath(file)
                     break
-                except OSError, excp:
+                except OSError as excp:
                     # first try to close the fd
                     try:
                         os.close(fd)
-                    except OSError, excp_:
+                    except OSError as excp_:
                         if excp_.errno == errno.EBADF:
                             pass
                         # strange error better raise it
@@ -368,7 +368,7 @@ def dump_item(inbox, type='file', prefix=None, suffix=None, dir=None, \
                 killed, status = os.waitpid(pid, os.WNOHANG)
                 if killed:
                     del_pid(pid)
-            except OSError, excp:
+            except OSError as excp:
                 if excp.errno == os.errno.ECHILD:
                     continue
                 raise
@@ -506,7 +506,7 @@ def make_lines(handle, follow=False, wait=0.1):
 # SERIALIZATION
 #
 # cPickle
-@imports(['cPickle', 'gc'])
+@imports(['pickle', 'gc'])
 def pickle_dumps(inbox):
     """
     Serializes the first element of the input using the pickle protocol using
@@ -515,18 +515,18 @@ def pickle_dumps(inbox):
     """
     # http://bugs.python.org/issue4074
     gc.disable()
-    str_ = cPickle.dumps(inbox[0], cPickle.HIGHEST_PROTOCOL)
+    str_ = pickle.dumps(inbox[0], pickle.HIGHEST_PROTOCOL)
     gc.enable()
     return str_
 
-@imports(['cPickle', 'gc'])
+@imports(['pickle', 'gc'])
 def pickle_loads(inbox):
     """
     Deserializes the first element of the input using the pickle protocol.
     
     """
     gc.disable()
-    obj = cPickle.loads(inbox[0])
+    obj = pickle.loads(inbox[0])
     gc.enable()
     return obj
 
